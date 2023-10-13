@@ -1,8 +1,8 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import matplotlib.pyplot as plt
-
 import plot_signals as signal_plot
 from test_output import signal_samples_are_equal
 
@@ -101,99 +101,85 @@ class Task1dot1:
 
 
 class Task1dot2:
-
     def __init__(self):
-        self.selected_option = None
+        self.selected_option = 'sine'  # Set the default value to 'sine'
         self.amp = None
         self.phase_shift = None
         self.analog_freq = None
         self.sampling_freq = None
         self.x_axis, self.y_axis = None, None
-
-        def get_signal_data():
-            self.selected_option = wave_type_variable.get()
-            self.amp = float(amp_txt_box.get())
-            self.phase_shift = float(phase_shift_txt_box.get())
-            self.analog_freq = float(analog_freq_txt_box.get())
-            self.sampling_freq = float(sampling_freq_txt_box.get())
-
-        def generate_signal():
-            get_signal_data()
-            self.x_axis, self.y_axis = signal_plot.SignalsMethods.generate_signal(self.amp, self.phase_shift,
-                                                                                  self.analog_freq,
-                                                                                  self.sampling_freq,
-                                                                                  self.selected_option)
-
-        def on_radio_button_selected():
-            self.selected_option = wave_type_variable.get()
-
-        def plot_signal():
-            generate_signal()
-            plt.subplot(2, 1, 1)
-
-            signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Continuous, True)
-            plt.subplot(2, 1, 2)
-            signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Discrete, True)
-
-            plt.grid(True)
-            plt.tight_layout()
-            plt.show()
-
-        def test_signal():
-            generate_signal()
-
-            if self.selected_option == 'sine':
-                test_message = signal_samples_are_equal('SinOutput.txt', self.y_axis)
-            else:
-                test_message = signal_samples_are_equal('CosOutput.txt', self.y_axis)
-
-            messagebox.showinfo(title='Test Case Result', message=test_message)
-
         self.root = tk.Tk()
         self.root.title('Generate Signals')
         self.root.geometry('800x500')
 
         # Create a label
         label = tk.Label(self.root, text="Signal Generation:", font=('Arial', 16))
-        label.grid(row=0, column=0, sticky=tk.W + tk.E, )
+        label.grid(row=0, column=0, sticky=tk.W + tk.E)
 
-        # Create a variable to store the selected option
+        wave_type_label = tk.Label(self.root, text="Wave Type:", font=('Arial', 16))
+        wave_type_label.grid(row=0, column=1, sticky=tk.W)
+        self.wave_type_combo = ttk.Combobox(self.root, values=['sine', 'cosine'], font=('Arial', 16))
+        self.wave_type_combo.current(0)
+        self.wave_type_combo.grid(row=0, column=2, padx=5, sticky=tk.W + tk.E)
 
-        wave_type_variable = tk.StringVar(value='sine')
-
-        # Create radio buttons
-        sin_radio_btn = tk.Radiobutton(self.root, text="Sine Wave", font=('Arial', 16), variable=wave_type_variable,
-                                       value='sine',
-                                       command=on_radio_button_selected)
-        sin_radio_btn.grid(row=0, column=1, sticky=tk.W + tk.E, )
-
-        cos_radio_btn = tk.Radiobutton(self.root, text="Cosine Wave", font=('Arial', 16), variable=wave_type_variable,
-                                       value='cosine',
-                                       command=on_radio_button_selected)
-        cos_radio_btn.grid(row=0, column=2, sticky=tk.W + tk.E, )
         amp_label = tk.Label(self.root, text="Amplitude:", font=('Arial', 16))
         amp_label.grid(row=1, column=0, sticky=tk.W)
-        amp_txt_box = tk.Entry(self.root, font=('Arial', 16))
-        amp_txt_box.grid(row=1, column=1, padx=5, sticky=tk.W + tk.E, )
+        self.amp_txt_box = tk.Entry(self.root, font=('Arial', 16))
+        self.amp_txt_box.grid(row=1, column=1, padx=5, sticky=tk.W + tk.E, )
         phase_shift_label = tk.Label(self.root, text="Phase Shift:", font=('Arial', 16))
         phase_shift_label.grid(row=2, column=0, sticky=tk.W)
-        phase_shift_txt_box = tk.Entry(self.root, font=('Arial', 16))
-        phase_shift_txt_box.grid(row=2, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.phase_shift_txt_box = tk.Entry(self.root, font=('Arial', 16))
+        self.phase_shift_txt_box.grid(row=2, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
         analog_freq_label = tk.Label(self.root, text="Analog Frequency:", font=('Arial', 16))
         analog_freq_label.grid(row=3, column=0, sticky=tk.W)
-        analog_freq_txt_box = tk.Entry(self.root, font=('Arial', 16))
-        analog_freq_txt_box.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.analog_freq_txt_box = tk.Entry(self.root, font=('Arial', 16))
+        self.analog_freq_txt_box.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
         sampling_freq_label = tk.Label(self.root, text="Sampling Frequency:", font=('Arial', 16))
         sampling_freq_label.grid(row=4, column=0, sticky=tk.W)
-        sampling_freq_txt_box = tk.Entry(self.root, font=('Arial', 16))
-        sampling_freq_txt_box.grid(row=4, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
-        generate_signal_btn = tk.Button(self.root, text='Generate Signal', font=('Arial', 14), command=plot_signal)
+        self.sampling_freq_txt_box = tk.Entry(self.root, font=('Arial', 16))
+        self.sampling_freq_txt_box.grid(row=4, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        generate_signal_btn = tk.Button(self.root, text='Generate Signal', font=('Arial', 14), command=self.plot_signal)
         generate_signal_btn.grid(row=5, column=1, padx=15, pady=15, )
-        test_signal_btn = tk.Button(self.root, text='Test Signal', font=('Arial', 14), command=test_signal)
+        test_signal_btn = tk.Button(self.root, text='Test Signal', font=('Arial', 14), command=self.test_signal)
         test_signal_btn.grid(row=6, column=1, padx=15, pady=15, )
         self.root.mainloop()
+
+    def get_signal_data(self):
+        self.selected_option = self.wave_type_combo.get()
+        self.amp = float(self.amp_txt_box.get())
+        self.phase_shift = float(self.phase_shift_txt_box.get())
+        self.analog_freq = float(self.analog_freq_txt_box.get())
+        self.sampling_freq = float(self.sampling_freq_txt_box.get())
+
+    def generate_signal(self):
+        self.get_signal_data()
+        self.x_axis, self.y_axis = signal_plot.SignalsMethods.generate_signal(self.amp, self.phase_shift,
+                                                                              self.analog_freq,
+                                                                              self.sampling_freq,
+                                                                              self.selected_option)
+
+    def plot_signal(self):
+        self.generate_signal()
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
+                                                      signal_plot.SignalType.Continuous, True)
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
+                                                      signal_plot.SignalType.Discrete, True)
+
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def test_signal(self):
+        self.generate_signal()
+
+        if self.selected_option == 'sine':
+            test_message = signal_samples_are_equal('SinOutput.txt', self.y_axis)
+        else:
+            test_message = signal_samples_are_equal('CosOutput.txt', self.y_axis)
+
+        messagebox.showinfo(title='Test Case Result', message=test_message)
 
 
 class Task1:
