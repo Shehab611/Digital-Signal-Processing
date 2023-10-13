@@ -20,7 +20,7 @@ class Task1dot1:
         self.indexes_two = None
         self.values_two = None
         self.root = tk.Tk()
-        self.root.title('First One')
+        self.root.title('Display Signals')
         self.root.geometry('800x500')
         self.button_frame = tk.Frame(self.root)
         self.button_frame.columnconfigure(0, weight=1)
@@ -59,37 +59,70 @@ class Task1dot1:
 
         if self.signal_one_type == 0:
             plt.subplot(4, 1, 1)
-            signal_plot.SignalPlot.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
-                                                      signal_plot.SignalType.Continuous, True)
+            signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
+                                                          signal_plot.SignalType.Continuous, True)
             plt.subplot(4, 1, 2)
-            signal_plot.SignalPlot.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
-                                                      signal_plot.SignalType.Discrete, True)
+            signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
+                                                          signal_plot.SignalType.Discrete, True)
         else:
             plt.subplot(4, 1, 1)
-            signal_plot.SignalPlot.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
-                                                      signal_plot.SignalType.Continuous, True)
+            signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
+                                                          signal_plot.SignalType.Continuous, True)
             plt.subplot(4, 1, 2)
-            signal_plot.SignalPlot.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
-                                                      signal_plot.SignalType.Discrete,
-                                                      True)
+            signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
+                                                          signal_plot.SignalType.Discrete,
+                                                          True)
 
         if self.signal_two:
             if self.signal_two_type == 0:
                 plt.subplot(4, 1, 3)
-                signal_plot.SignalPlot.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Continuous, False)
+                signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
+                                                              signal_plot.SignalType.Continuous, False)
                 plt.subplot(4, 1, 4)
-                signal_plot.SignalPlot.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Discrete, False)
+                signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
+                                                              signal_plot.SignalType.Discrete, False)
             else:
                 plt.subplot(4, 1, 3)
-                signal_plot.SignalPlot.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency', 'Phase Shift',
-                                                          signal_plot.SignalType.Continuous, False)
+                signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
+                                                              'Phase Shift',
+                                                              signal_plot.SignalType.Continuous, False)
                 plt.subplot(4, 1, 4)
-                signal_plot.SignalPlot.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency', 'Phase Shift',
-                                                          signal_plot.SignalType.Discrete,
-                                                          False)
+                signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
+                                                              'Phase Shift',
+                                                              signal_plot.SignalType.Discrete,
+                                                              False)
 
         plt.grid(True)
         plt.tight_layout()
         plt.show()
+
+
+class Task1dot2:
+
+    def __init__(self):
+        def on_radio_button_selected():
+            selected_option = wave_type_variable.get()
+            print("Selected option:", selected_option)
+
+        self.root = tk.Tk()
+        self.root.title('Generate Signals')
+        self.root.geometry('800x500')
+        # Create a label
+        label = tk.Label(self.root, text="Signal Generation:", font=('Arial', 16))
+        label.grid(row=0, column=0, sticky=tk.W)
+
+        # Create a variable to store the selected option
+        wave_type_variable = tk.StringVar(value='sin')
+
+        # Create radio buttons
+        sin_radio_btn = tk.Radiobutton(self.root, text="Sine Wave", font=('Arial', 16), variable=wave_type_variable,
+                                       value="sin",
+                                       command=on_radio_button_selected)
+        sin_radio_btn.grid(row=0, column=1)
+
+        cos_radio_btn = tk.Radiobutton(self.root, text="Cosine Wave", font=('Arial', 16), variable=wave_type_variable,
+                                       value="cos",
+                                       command=on_radio_button_selected)
+        cos_radio_btn.grid(row=0, column=2)
+
+        self.root.mainloop()

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from enum import Enum
 
 
-class SignalPlot:
+class SignalsMethods:
     @staticmethod
     def plot_normal_signal(indexes, values, x_label, y_label, signal_type, is_first):
         label = 'Continuous' if signal_type == SignalType.Continuous else 'Discrete'

@@ -1,3 +1,4 @@
-from gui_file import Task1dot1
+import gui_file as gui
 
-Task1dot1()
+# Task1dot1()
+gui.Task1dot2()
