@@ -95,7 +95,6 @@ class Task1dot1:
                                                               signal_plot.SignalType.Discrete,
                                                               False)
 
-        plt.grid(True)
         plt.tight_layout()
         plt.show()
 
@@ -161,10 +160,17 @@ class Task1dot2:
     def plot_signal(self):
         self.generate_signal()
         plt.subplot(2, 1, 1)
-        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
+        y_label = 'Amplitude'
+        if self.sampling_freq == 0:
+            x_label = ' Time '
+
+        else:
+            x_label = 'Samples'
+
+        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
                                                       signal_plot.SignalType.Continuous, True)
         plt.subplot(2, 1, 2)
-        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, 'Time', 'Amplitude',
+        signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
                                                       signal_plot.SignalType.Discrete, True)
 
         plt.grid(True)
