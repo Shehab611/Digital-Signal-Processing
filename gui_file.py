@@ -48,43 +48,43 @@ class Task1dot1:
             plt.subplot(2, 2, 1)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time',
                                                           'Amplitude',
-                                                          signal_plot.SignalType.Continuous, True,
+                                                          signal_plot.SignalType.Continuous,
                                                           signal_title='First Continuous Signal')
             plt.subplot(2, 2, 3)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Discrete, True,
+                                                          signal_plot.SignalType.Discrete,
                                                           'First Discrete Signal')
         else:
             plt.subplot(2, 2, 1)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
-                                                          signal_plot.SignalType.Continuous, True,
+                                                          signal_plot.SignalType.Continuous,
                                                           'First Continuous Signal')
             plt.subplot(2, 2, 3)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
                                                           signal_plot.SignalType.Discrete,
-                                                          True, 'First Discrete Signal')
+                                                          'First Discrete Signal')
 
         if self.signal_two_type is not None:
             if self.signal_two_type == 0:
                 plt.subplot(2, 2, 2)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                              signal_plot.SignalType.Continuous, False,
+                                                              signal_plot.SignalType.Continuous,
                                                               'Second Continuous Signal')
                 plt.subplot(2, 2, 4)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                              signal_plot.SignalType.Discrete, False,
+                                                              signal_plot.SignalType.Discrete,
                                                               'Second Discrete Signal')
             else:
                 plt.subplot(2, 2, 2)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
                                                               'Phase Shift',
-                                                              signal_plot.SignalType.Continuous, False,
+                                                              signal_plot.SignalType.Continuous,
                                                               'Second Continuous Signal')
                 plt.subplot(2, 2, 4)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
                                                               'Phase Shift',
                                                               signal_plot.SignalType.Discrete,
-                                                              False,
+
                                                               'Second Discrete Signal')
 
         plt.tight_layout()
@@ -160,11 +160,11 @@ class Task1dot2:
             x_label = 'Samples'
 
         signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
-                                                      signal_plot.SignalType.Continuous, True,
+                                                      signal_plot.SignalType.Continuous,
                                                       'Continuous Signal')
         plt.subplot(2, 1, 2)
         signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
-                                                      signal_plot.SignalType.Discrete, True,
+                                                      signal_plot.SignalType.Discrete,
                                                       'Discrete Signal')
 
         plt.grid(True)
@@ -217,12 +217,12 @@ class Task2:
         plt.subplot(2, 2, 1)
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time',
                                                       'Amplitude',
-                                                      signal_plot.SignalType.Continuous, True,
+                                                      signal_plot.SignalType.Continuous,
                                                       'Signal One')
         plt.subplot(2, 2, 2)
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time',
                                                       'Amplitude',
-                                                      signal_plot.SignalType.Continuous, True,
+                                                      signal_plot.SignalType.Continuous,
                                                       'Signal Two')
         plt.subplot(2, 1, 2)
         if op == '+':
@@ -231,7 +231,7 @@ class Task2:
             title = 'Subtraction'
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.signal_one_output, 'Time',
                                                       'Amplitude',
-                                                      signal_plot.SignalType.Continuous, True,
+                                                      signal_plot.SignalType.Continuous,
                                                       f'{title} Signal')
 
         plt.grid(True)

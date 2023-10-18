@@ -7,7 +7,7 @@ import numpy as np
 
 class SignalsMethods:
     @staticmethod
-    def plot_normal_signal(indexes, values, x_label, y_label, signal_type, is_first, signal_title):
+    def plot_normal_signal(indexes, values, x_label, y_label, signal_type, signal_title):
         plt.title(signal_title)
         if signal_type == SignalType.Continuous:
             plt.plot(indexes, values, )
@@ -22,7 +22,7 @@ class SignalsMethods:
         signal = None
 
         if sampling_freq == 0:
-            # t = np.arange(0, 1,1/(angular_freq * 2))
+
             t = np.arange(0, 10, 0.01)
             omega = 2 * np.pi * angular_freq
             if signal_type == 'sine':
@@ -52,7 +52,7 @@ class SignalsMethods:
         return signal_type, is_periodic, num_samples, indexes, values
 
     @staticmethod
-    def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None,multiplier=None):
+    def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None, multiplier=None):
         signal_output = None
         if operation == ArithmeticSignalOperations.Addition:
             signal_output = [x + y for x, y in zip(y1_values, y2_values)]
