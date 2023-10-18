@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
@@ -10,8 +9,6 @@ from test_output import signal_samples_are_equal
 class Task1dot1:
 
     def __init__(self):
-        self.signal_one = None
-        self.signal_two = None
         self.signal_one_type = None
         self.is_periodic_one = None
         self.num_samples_one = None
@@ -38,24 +35,12 @@ class Task1dot1:
         self.root.mainloop()
 
     def choose_signal_one(self):
-        self.signal_one = filedialog.askopenfile(filetypes=[("txt", "*.txt")])
-        # define the signal
-        self.signal_one_type = int(self.signal_one.readline().strip())
-        self.is_periodic_one = int(self.signal_one.readline().strip())
-        self.num_samples_one = int(self.signal_one.readline().strip())
-        samples_one = [list(map(float, line.strip().split())) for line in self.signal_one]
-        self.indexes_one = [sample[0] for sample in samples_one]
-        self.values_one = [sample[1] for sample in samples_one]
+        self.signal_one_type, self.is_periodic_one, self.num_samples_one, self.indexes_one, self.values_one = (
+            signal_plot.SignalsMethods.read_signal())
 
     def choose_signal_two(self):
-        self.signal_two = filedialog.askopenfile(filetypes=[("txt", "*.txt")])
-        # define the signal
-        self.signal_two_type = int(self.signal_two.readline().strip())
-        self.is_periodic_two = int(self.signal_two.readline().strip())
-        self.num_samples_two = int(self.signal_two.readline().strip())
-        samples_two = [list(map(float, line.strip().split())) for line in self.signal_two]
-        self.indexes_two = [sample[0] for sample in samples_two]
-        self.values_two = [sample[1] for sample in samples_two]
+        self.signal_two_type, self.is_periodic_two, self.num_samples_two, self.indexes_two, self.values_two = (
+            signal_plot.SignalsMethods.read_signal())
 
     def display_signal(self):
 
@@ -63,37 +48,44 @@ class Task1dot1:
             plt.subplot(2, 2, 1)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time',
                                                           'Amplitude',
-                                                          signal_plot.SignalType.Continuous, True)
+                                                          signal_plot.SignalType.Continuous, True,
+                                                          signal_title='First Continuous Signal')
             plt.subplot(2, 2, 3)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time', 'Amplitude',
-                                                          signal_plot.SignalType.Discrete, True)
+                                                          signal_plot.SignalType.Discrete, True,
+                                                          'First Discrete Signal')
         else:
             plt.subplot(2, 2, 1)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
-                                                          signal_plot.SignalType.Continuous, True)
+                                                          signal_plot.SignalType.Continuous, True,
+                                                          'First Continuous Signal')
             plt.subplot(2, 2, 3)
             signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Frequency', 'Phase Shift',
                                                           signal_plot.SignalType.Discrete,
-                                                          True)
+                                                          True, 'First Discrete Signal')
 
-        if self.signal_two:
+        if self.signal_two_type is not None:
             if self.signal_two_type == 0:
                 plt.subplot(2, 2, 2)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                              signal_plot.SignalType.Continuous, False)
+                                                              signal_plot.SignalType.Continuous, False,
+                                                              'Second Continuous Signal')
                 plt.subplot(2, 2, 4)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time', 'Amplitude',
-                                                              signal_plot.SignalType.Discrete, False)
+                                                              signal_plot.SignalType.Discrete, False,
+                                                              'Second Discrete Signal')
             else:
                 plt.subplot(2, 2, 2)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
                                                               'Phase Shift',
-                                                              signal_plot.SignalType.Continuous, False)
+                                                              signal_plot.SignalType.Continuous, False,
+                                                              'Second Continuous Signal')
                 plt.subplot(2, 2, 4)
                 signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Frequency',
                                                               'Phase Shift',
                                                               signal_plot.SignalType.Discrete,
-                                                              False)
+                                                              False,
+                                                              'Second Discrete Signal')
 
         plt.tight_layout()
         plt.show()
@@ -168,10 +160,12 @@ class Task1dot2:
             x_label = 'Samples'
 
         signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
-                                                      signal_plot.SignalType.Continuous, True)
+                                                      signal_plot.SignalType.Continuous, True,
+                                                      'Continuous Signal')
         plt.subplot(2, 1, 2)
         signal_plot.SignalsMethods.plot_normal_signal(self.x_axis, self.y_axis, x_label, y_label,
-                                                      signal_plot.SignalType.Discrete, True)
+                                                      signal_plot.SignalType.Discrete, True,
+                                                      'Discrete Signal')
 
         plt.grid(True)
         plt.tight_layout()
@@ -210,11 +204,95 @@ class Task1:
         self.root.mainloop()
 
 
+class Task2:
+    def choose_signal_one(self):
+        self.signal_one_type, self.is_periodic_one, self.num_samples_one, self.indexes_one, self.values_one = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def choose_signal_two(self):
+        self.signal_two_type, self.is_periodic_two, self.num_samples_two, self.indexes_two, self.values_two = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def add_subtract_signal_representation(self, op):
+        plt.subplot(2, 2, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time',
+                                                      'Amplitude',
+                                                      signal_plot.SignalType.Continuous, True,
+                                                      'Signal One')
+        plt.subplot(2, 2, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.values_two, 'Time',
+                                                      'Amplitude',
+                                                      signal_plot.SignalType.Continuous, True,
+                                                      'Signal Two')
+        plt.subplot(2, 1, 2)
+        if op == '+':
+            title = 'Addition'
+        else:
+            title = 'Subtraction'
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes_two, self.signal_one_output, 'Time',
+                                                      'Amplitude',
+                                                      signal_plot.SignalType.Continuous, True,
+                                                      f'{title} Signal')
+
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def add_signals(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Addition,
+            y1_values=self.values_one, y2_values=self.values_two)
+        self.add_subtract_signal_representation('+')
+
+    def subtract_signals(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Subtraction,
+            y1_values=self.values_one, y2_values=self.values_two)
+        self.add_subtract_signal_representation('-')
+
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def __init__(self):
+        self.signal_one_output = None
+        self.signal_two_output = None
+        self.signal_one_type = None
+        self.is_periodic_one = None
+        self.num_samples_one = None
+        self.indexes_one = None
+        self.values_one = None
+        self.signal_two_type = None
+        self.is_periodic_two = None
+        self.num_samples_two = None
+        self.indexes_two = None
+        self.values_two = None
+        self.root = tk.Tk()
+        self.root.title('Display Signals')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        self.choose1_btn = tk.Button(self.button_frame, text='Choose First Signal', command=self.choose_signal_one)
+        self.choose1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
+        self.choose2_btn = tk.Button(self.button_frame, text='Choose Second Signal', command=self.choose_signal_two)
+        self.choose2_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
+        self.display_btn = tk.Button(self.button_frame, text='Add Two Signals', command=self.add_signals)
+        self.display_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
+        self.display_btn = tk.Button(self.button_frame, text='Subtract Two Signals', command=self.subtract_signals)
+        self.display_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=40)
+        self.button_frame.pack(fill='x', pady=10)
+        self.root.mainloop()
+
+
 class MainGui:
 
     def __init__(self):
         def open_task_one():
             Task1()
+
+        def open_task_two():
+            Task2()
 
         self.root = tk.Tk()
         self.root.title('Choose Task')
@@ -224,5 +302,7 @@ class MainGui:
         self.button_frame.columnconfigure(1, weight=1)
         self.task1_btn = tk.Button(self.button_frame, text='Task 1', command=open_task_one)
         self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 2', command=open_task_two)
+        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

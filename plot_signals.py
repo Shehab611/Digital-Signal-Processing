@@ -1,3 +1,5 @@
+from tkinter import filedialog
+
 import matplotlib.pyplot as plt
 from enum import Enum
 import numpy as np
@@ -5,10 +7,8 @@ import numpy as np
 
 class SignalsMethods:
     @staticmethod
-    def plot_normal_signal(indexes, values, x_label, y_label, signal_type, is_first):
-        label = 'Continuous' if signal_type == SignalType.Continuous else 'Discrete'
-        new_label = 'First' if is_first else 'Second'
-        plt.title(f'{new_label} {label} Signal')
+    def plot_normal_signal(indexes, values, x_label, y_label, signal_type, is_first, signal_title):
+        plt.title(signal_title)
         if signal_type == SignalType.Continuous:
             plt.plot(indexes, values, )
         else:
@@ -39,9 +39,43 @@ class SignalsMethods:
 
         return t, signal
 
+    @staticmethod
+    def read_signal():
+        signal = filedialog.askopenfile(filetypes=[("txt", "*.txt")])
+        # define the signal
+        signal_type = int(signal.readline().strip())
+        is_periodic = int(signal.readline().strip())
+        num_samples = int(signal.readline().strip())
+        samples_one = [list(map(float, line.strip().split())) for line in signal]
+        indexes = [sample[0] for sample in samples_one]
+        values = [sample[1] for sample in samples_one]
+        return signal_type, is_periodic, num_samples, indexes, values
+
+    @staticmethod
+    def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None,multiplier=None):
+        signal_output = None
+        if operation == ArithmeticSignalOperations.Addition:
+            signal_output = [x + y for x, y in zip(y1_values, y2_values)]
+        elif operation == ArithmeticSignalOperations.Subtraction:
+            signal_output = [x - y for x, y in zip(y1_values, y2_values)]
+        elif operation == ArithmeticSignalOperations.Multiplication:
+            signal_output = [x * multiplier for x in y1_values]
+        elif operation == ArithmeticSignalOperations.Squaring:
+            signal_output = [x ** 2 for x in y1_values]
+
+        return signal_output
+
 
 class SignalType(Enum):
     Continuous = 1
     Discrete = 2
-    Cosine = 3
-    Sine = 4
+
+
+class ArithmeticSignalOperations(Enum):
+    Addition = 0
+    Subtraction = 1
+    Multiplication = 2
+    Squaring = 3
+    Shifting = 4
+    Normalization = 5
+    Accumulation = 6
