@@ -61,6 +61,13 @@ class SignalsMethods:
             signal_output = [x * multiplier for x in y1_values]
         elif operation == ArithmeticSignalOperations.Squaring:
             signal_output = [x ** 2 for x in y1_values]
+        elif operation == ArithmeticSignalOperations.Accumulation:
+            accumulated_signal = []
+            accumulated_sum = 0
+            for point in y1_values:
+                accumulated_sum += point
+                accumulated_signal.append(accumulated_sum)
+            signal_output = accumulated_signal
 
         return signal_output
 

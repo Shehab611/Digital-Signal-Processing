@@ -261,6 +261,8 @@ class Task2:
             title = 'Multiply'
         elif op == '^':
             title = 'Squaring'
+        elif op == 'a':
+            title = 'Accumulating'
         else:
             title = 'Shifting'
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.signal_one_output, 'Time',
@@ -272,12 +274,18 @@ class Task2:
         plt.tight_layout()
         plt.show()
 
-    def square_signal_one(self):
+    def square_signal(self):
         self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
             operation=signal_plot.ArithmeticSignalOperations.Squaring,
             y1_values=self.values_one)
 
         self.square_multiply_shift_signal_representation('^')
+
+    def accumulate_signal(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Accumulation,
+            y1_values=self.values_one)
+        self.square_multiply_shift_signal_representation('a')
 
     def __init__(self):
         self.signal_one_output = None
@@ -307,8 +315,12 @@ class Task2:
         self.subtract_signal_btn = tk.Button(self.button_frame, text='Subtract Two Signals',
                                              command=self.subtract_signals)
         self.subtract_signal_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=40)
-        self.square_signal_btn = tk.Button(self.button_frame, text='Square Signal One', command=self.square_signal_one)
+        self.square_signal_btn = tk.Button(self.button_frame, text='Square Signal One', command=self.square_signal)
         self.square_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.button_frame.pack(fill='x', pady=10)
+        self.accumulate_signal_btn = tk.Button(self.button_frame, text='Accumulate Signal One',
+                                               command=self.accumulate_signal)
+        self.accumulate_signal_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
 
