@@ -22,7 +22,6 @@ class SignalsMethods:
         signal = None
 
         if sampling_freq == 0:
-
             t = np.arange(0, 10, 0.01)
             omega = 2 * np.pi * angular_freq
             if signal_type == 'sine':
