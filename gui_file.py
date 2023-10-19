@@ -250,7 +250,7 @@ class Task2:
             y1_values=self.values_one, y2_values=self.values_two)
         self.add_subtract_signal_representation('-')
 
-    def square_multiply_shift_signal_representation(self, op):
+    def signal_representation(self, op):
         plt.subplot(2, 1, 1)
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.values_one, 'Time',
                                                       'Amplitude',
@@ -279,13 +279,13 @@ class Task2:
             operation=signal_plot.ArithmeticSignalOperations.Squaring,
             y1_values=self.values_one)
 
-        self.square_multiply_shift_signal_representation('^')
+        self.signal_representation('^')
 
     def accumulate_signal(self):
         self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
             operation=signal_plot.ArithmeticSignalOperations.Accumulation,
             y1_values=self.values_one)
-        self.square_multiply_shift_signal_representation('a')
+        self.signal_representation('a')
 
     def __init__(self):
         self.signal_one_output = None

@@ -20,7 +20,6 @@ class SignalsMethods:
     @staticmethod
     def generate_signal(amp, phase_shift, angular_freq, sampling_freq, signal_type):
         signal = None
-
         if sampling_freq == 0:
             t = np.arange(0, 10, 0.01)
             omega = 2 * np.pi * angular_freq
