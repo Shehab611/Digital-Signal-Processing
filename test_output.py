@@ -2,9 +2,9 @@ def signal_samples_are_equal(file_name, samples):
     expected_indices = []
     expected_samples = []
     with open(file_name, 'r') as f:
-        line = f.readline()
-        line = f.readline()
-        line = f.readline()
+        f.readline()
+        f.readline()
+        f.readline()
         line = f.readline()
         while line:
             # process line
@@ -20,7 +20,6 @@ def signal_samples_are_equal(file_name, samples):
                 break
 
     if len(expected_samples) != len(samples):
-
         return "Test case failed, your signal have different length from the expected one"
 
     for i in range(len(expected_samples)):
