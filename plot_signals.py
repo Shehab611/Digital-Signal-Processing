@@ -50,7 +50,7 @@ class SignalsMethods:
         return signal_type, is_periodic, num_samples, indexes, values
 
     @staticmethod
-    def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None, multiplier=None):
+    def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None, multiplier=None, normalize=None):
         signal_output = None
         if operation == ArithmeticSignalOperations.Addition:
             signal_output = [x + y for x, y in zip(y1_values, y2_values)]
@@ -69,7 +69,13 @@ class SignalsMethods:
             signal_output = accumulated_signal
         elif operation == ArithmeticSignalOperations.Shifting:
             signal_output = [x + multiplier for x in y1_values]
-
+        else :
+            min_value = min(y1_values)
+            max_value = max(y1_values)
+            if normalize == '-1':
+                signal_output = [2 * ((x - min_value) / (max_value - min_value)) - 1 for x in y1_values]
+            else:
+                signal_output = [(x - min_value) / (max_value - min_value) for x in y1_values]
         return signal_output
 
 

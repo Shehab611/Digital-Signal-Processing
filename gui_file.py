@@ -263,6 +263,8 @@ class Task2:
             title = 'Squaring'
         elif op == 'a':
             title = 'Accumulating'
+        elif op == 'n':
+            title = 'Normalized'
         else:
             title = 'Shifting'
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.signal_one_output, 'Time',
@@ -292,6 +294,18 @@ class Task2:
             operation=signal_plot.ArithmeticSignalOperations.Multiplication,
             y1_values=self.values_one, multiplier=int(self.shift_mult_txt_box.get()))
         self.signal_representation('*')
+
+    def normalize_from_zero_signal(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Normalization,
+            y1_values=self.values_one, normalize='0')
+        self.signal_representation('n')
+
+    def normalize_signal(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Normalization,
+            y1_values=self.values_one, normalize='-1')
+        self.signal_representation('n')
 
     def shifting_signal(self):
         self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
@@ -331,7 +345,6 @@ class Task2:
         self.subtract_signal_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=40)
         self.square_signal_btn = tk.Button(self.button_frame, text='Square Signal One', command=self.square_signal)
         self.square_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
-        self.button_frame.pack(fill='x', pady=10)
         self.accumulate_signal_btn = tk.Button(self.button_frame, text='Accumulate Signal One',
                                                command=self.accumulate_signal)
         self.accumulate_signal_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
@@ -339,10 +352,18 @@ class Task2:
         self.shift_mult_lbl.grid(row=3, column=0, sticky=tk.W)
         self.shift_mult_txt_box = tk.Entry(self.button_frame, font=('Arial', 16))
         self.shift_mult_txt_box.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
-        self.multiply_signal_btn = tk.Button(self.button_frame, text='Multiply Signal One', command=self.multiply_signal)
+        self.multiply_signal_btn = tk.Button(self.button_frame, text='Multiply Signal One',
+                                             command=self.multiply_signal)
         self.multiply_signal_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
-        self.multiply_signal_btn = tk.Button(self.button_frame, text='Shifting Signal One', command=self.shifting_signal)
+        self.multiply_signal_btn = tk.Button(self.button_frame, text='Shifting Signal One',
+                                             command=self.shifting_signal)
         self.multiply_signal_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.normalize_from_zero_signal_btn = tk.Button(self.button_frame, text='Normalize Signal One from 0 to 1',
+                                                        command=self.normalize_from_zero_signal)
+        self.normalize_from_zero_signal_btn.grid(row=5, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.normalize_signal_btn = tk.Button(self.button_frame, text='Normalize Signal One from -1 to 1',
+                                              command=self.normalize_signal)
+        self.normalize_signal_btn.grid(row=5, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
 
