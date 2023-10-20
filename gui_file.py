@@ -267,6 +267,8 @@ class Task2:
             title = 'Normalized'
         else:
             title = 'Shifting'
+            self.indexes_one = self.signal_one_output
+            self.signal_one_output = self.values_one
         signal_plot.SignalsMethods.plot_normal_signal(self.indexes_one, self.signal_one_output, 'Time',
                                                       'Amplitude',
                                                       signal_plot.SignalType.Continuous,
