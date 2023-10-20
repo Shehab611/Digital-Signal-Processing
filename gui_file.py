@@ -10,13 +10,9 @@ class Task1dot1:
 
     def __init__(self):
         self.signal_one_type = None
-        self.is_periodic_one = None
-        self.num_samples_one = None
         self.indexes_one = None
         self.values_one = None
         self.signal_two_type = None
-        self.is_periodic_two = None
-        self.num_samples_two = None
         self.indexes_two = None
         self.values_two = None
         self.root = tk.Tk()
@@ -35,11 +31,11 @@ class Task1dot1:
         self.root.mainloop()
 
     def choose_signal_one(self):
-        self.signal_one_type, self.is_periodic_one, self.num_samples_one, self.indexes_one, self.values_one = (
+        self.signal_one_type, is_periodic_one, num_samples_one, self.indexes_one, self.values_one = (
             signal_plot.SignalsMethods.read_signal())
 
     def choose_signal_two(self):
-        self.signal_two_type, self.is_periodic_two, self.num_samples_two, self.indexes_two, self.values_two = (
+        self.signal_two_type, is_periodic_two, num_samples_two, self.indexes_two, self.values_two = (
             signal_plot.SignalsMethods.read_signal())
 
     def display_signal(self):
@@ -206,11 +202,11 @@ class Task1:
 
 class Task2:
     def choose_signal_one(self):
-        self.signal_one_type, self.is_periodic_one, self.num_samples_one, self.indexes_one, self.values_one = (
+        signal_one_type, is_periodic_one, num_samples_one, self.indexes_one, self.values_one = (
             signal_plot.SignalsMethods.read_signal())
 
     def choose_signal_two(self):
-        self.signal_two_type, self.is_periodic_two, self.num_samples_two, self.indexes_two, self.values_two = (
+        signal_two_type, is_periodic_two, num_samples_two, self.indexes_two, self.values_two = (
             signal_plot.SignalsMethods.read_signal())
 
     def add_subtract_signal_representation(self, op):
@@ -313,19 +309,16 @@ class Task2:
         self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
             operation=signal_plot.ArithmeticSignalOperations.Shifting,
             y1_values=self.indexes_one, multiplier=int(self.shift_mult_txt_box.get()))
+        print(self.signal_one_output)
+        print(signal_samples_are_equal('output shifting by add 500.txt', self.signal_one_output))
         self.signal_representation('')
 
     def __init__(self):
         self.signal_one_output = None
-        self.signal_two_output = None
-        self.signal_one_type = None
         self.is_periodic_one = None
         self.num_samples_one = None
         self.indexes_one = None
         self.values_one = None
-        self.signal_two_type = None
-        self.is_periodic_two = None
-        self.num_samples_two = None
         self.indexes_two = None
         self.values_two = None
         self.root = tk.Tk()
