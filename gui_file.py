@@ -313,8 +313,6 @@ class Task2:
         self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
             operation=signal_plot.ArithmeticSignalOperations.Shifting,
             y1_values=self.indexes_one, multiplier=int(self.shift_mult_txt_box.get()))
-        print(self.signal_one_output)
-        print(signal_samples_are_equal('output shifting by add 500.txt', self.signal_one_output))
         self.signal_representation('')
 
     def __init__(self):
