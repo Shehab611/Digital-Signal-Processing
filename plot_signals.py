@@ -44,9 +44,9 @@ class SignalsMethods:
         signal_type = int(signal.readline().strip())
         is_periodic = int(signal.readline().strip())
         num_samples = int(signal.readline().strip())
-        samples_one = [list(map(float, line.strip().split())) for line in signal]
-        indexes = [sample[0] for sample in samples_one]
-        values = [sample[1] for sample in samples_one]
+        samples = [list(map(float, line.strip().split())) for line in signal]
+        indexes = [sample[0] for sample in samples]
+        values = [sample[1] for sample in samples]
         return signal_type, is_periodic, num_samples, indexes, values
 
     @staticmethod
