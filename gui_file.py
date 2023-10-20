@@ -287,6 +287,20 @@ class Task2:
             y1_values=self.values_one)
         self.signal_representation('a')
 
+    def multiply_signal(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Multiplication,
+            y1_values=self.values_one, multiplier=int(self.shift_mult_txt_box.get()))
+        self.signal_representation('*')
+
+    def shifting_signal(self):
+        self.signal_one_output = signal_plot.SignalsMethods.arithmetic_operations_on_signal(
+            operation=signal_plot.ArithmeticSignalOperations.Shifting,
+            y1_values=self.indexes_one, multiplier=int(self.shift_mult_txt_box.get()))
+        print(self.signal_one_output)
+        print(signal_samples_are_equal('output shifting by add 500.txt', self.signal_one_output))
+        self.signal_representation('')
+
     def __init__(self):
         self.signal_one_output = None
         self.signal_two_output = None
@@ -321,6 +335,14 @@ class Task2:
         self.accumulate_signal_btn = tk.Button(self.button_frame, text='Accumulate Signal One',
                                                command=self.accumulate_signal)
         self.accumulate_signal_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.shift_mult_lbl = tk.Label(self.button_frame, text="Shifting & Multiply:", font=('Arial', 16))
+        self.shift_mult_lbl.grid(row=3, column=0, sticky=tk.W)
+        self.shift_mult_txt_box = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.shift_mult_txt_box.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.multiply_signal_btn = tk.Button(self.button_frame, text='Multiply Signal One', command=self.multiply_signal)
+        self.multiply_signal_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.multiply_signal_btn = tk.Button(self.button_frame, text='Shifting Signal One', command=self.shifting_signal)
+        self.multiply_signal_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
 

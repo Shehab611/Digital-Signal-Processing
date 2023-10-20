@@ -67,6 +67,8 @@ class SignalsMethods:
                 accumulated_sum += point
                 accumulated_signal.append(accumulated_sum)
             signal_output = accumulated_signal
+        elif operation == ArithmeticSignalOperations.Shifting:
+            signal_output = [x + multiplier for x in y1_values]
 
         return signal_output
 
