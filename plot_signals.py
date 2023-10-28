@@ -1,3 +1,5 @@
+import math
+from decimal import Decimal, getcontext
 from tkinter import filedialog
 
 import matplotlib.pyplot as plt
@@ -76,6 +78,53 @@ class SignalsMethods:
             else:
                 signal_output = [(x - min_value) / (max_value - min_value) for x in y1_values]
         return signal_output
+
+    @staticmethod
+    def quantize_signal(type_of_signal, values, number_of_levels_or_bits):
+        # Get Max & Min Ampl
+        getcontext().prec = 4
+        max_ampl = Decimal(max(values))
+        min_ampl = Decimal(min(values))
+        diff_in_ampl = max_ampl - min_ampl
+
+        # calculate resolution
+        if type_of_signal == "Bits":
+            encoded_bits = number_of_levels_or_bits
+            resolution = diff_in_ampl / Decimal(pow(2, number_of_levels_or_bits))
+        else:
+            encoded_bits = math.log2(number_of_levels_or_bits)
+            resolution = diff_in_ampl / Decimal(number_of_levels_or_bits)
+        getcontext().prec = 4
+
+        # calculate intervals
+        intervals = []
+        value = min_ampl
+        while value < max_ampl:
+            intervals.append([float(value), float(value + resolution)])
+            value += resolution
+        # encoding signal
+        binary_values = [bin(i)[2:].zfill(int(encoded_bits)) for i in range(2 ** int(encoded_bits))]
+        int_values = [int(b, 2) + 1 for b in binary_values]
+        encoded_values = dict(zip(int_values, binary_values))
+
+        # interval index
+        interval_index = []
+        xqn = []
+        all_encodes = []
+        print(intervals)
+        for i in range(len(values)):
+
+            for index, interval in enumerate(intervals):
+                if interval[0] <= values[i] <= interval[1]:
+                    interval_index.append(index + 1)
+                    xqn.append(float(Decimal((Decimal(interval[0]) + Decimal(interval[1])) / 2)))
+                    all_encodes.append(encoded_values[index + 1])
+                    break
+
+        # Get Error
+        getcontext().prec = 3
+        errorofn = [float(Decimal(er) - Decimal(xn)) for er, xn in zip(xqn, values)]
+        return interval_index, all_encodes, xqn, errorofn
 
 
 class SignalType(Enum):

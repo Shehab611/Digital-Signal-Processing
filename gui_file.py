@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
-from test_output import signal_samples_are_equal
+from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2
 
 
 class Task1dot1:
@@ -361,6 +361,68 @@ class Task2:
         self.root.mainloop()
 
 
+class Task3:
+    def choose_signal_one(self):
+        signal_type, is_periodic_one, num_samples_one, indexes, self.values = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def get_data(self):
+        self.levels_or_bits = self.levels_or_bits_combo.get()
+        self.number_of_levels_or_bits = int(self.levels_or_bits_txt_box.get())
+
+    def quantize_signal(self):
+        self.get_data()
+        self.interval_index, self.encoded_values, self.xqn, self.errorofn = signal_plot.SignalsMethods.quantize_signal(
+            self.levels_or_bits, self.values,
+            self.number_of_levels_or_bits)
+
+    def test_quantized_signal_one(self):
+        self.quantize_signal()
+
+        test_message = QuantizationTest1("Quan1_Out.txt", self.encoded_values, self.xqn)
+        messagebox.showinfo(title='Test Case Result', message=test_message)
+
+    def test_quantized_signal_two(self):
+        self.quantize_signal()
+        test_message = QuantizationTest2("Quan2_Out.txt", self.interval_index, self.encoded_values, self.xqn,
+                                         self.errorofn)
+        messagebox.showinfo(title='Test Case Result', message=test_message)
+
+    def __init__(self):
+        self.values = None
+        self.number_of_levels_or_bits = None
+        self.levels_or_bits = None
+        self.interval_index, self.encoded_values, self.xqn, self.errorofn = None, None, None, None
+        self.selected_option = 'Bits'
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        label = tk.Label(self.button_frame, text="Number of Bits or Levels", font=('Arial', 16))
+        label.grid(row=0, column=0, sticky=tk.W)
+        self.levels_or_bits_combo = ttk.Combobox(self.button_frame, values=['Bits', 'Levels'], font=('Arial', 16))
+        self.levels_or_bits_combo.current(0)
+        self.levels_or_bits_combo.grid(row=0, column=1, padx=5, sticky=tk.W + tk.E)
+        label = tk.Label(self.button_frame, text="Enter Number of Bits or Levels", font=('Arial', 16))
+        label.grid(row=1, column=0, sticky=tk.W, pady=18)
+        self.levels_or_bits_txt_box = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.levels_or_bits_txt_box.grid(row=1, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Choose The Signal', command=self.choose_signal_one)
+        self.choose1_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Quantize The Signal', command=self.quantize_signal)
+        self.choose1_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=15, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Test Quantized Signal One',
+                                     command=self.test_quantized_signal_one)
+        self.choose1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Test Quantized Signal Two',
+                                     command=self.test_quantized_signal_two)
+        self.choose1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=15, pady=18)
+        self.button_frame.pack(fill='x', pady=15)
+        self.root.mainloop()
+
+
 class MainGui:
 
     def __init__(self):
@@ -369,6 +431,9 @@ class MainGui:
 
         def open_task_two():
             Task2()
+
+        def open_task_three():
+            Task3()
 
         self.root = tk.Tk()
         self.root.title('Choose Task')
@@ -380,5 +445,7 @@ class MainGui:
         self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 2', command=open_task_two)
         self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 3', command=open_task_three)
+        self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
