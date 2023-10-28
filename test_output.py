@@ -53,10 +53,6 @@ def QuantizationTest1(file_name, Your_EncodedValues, Your_QuantizedValues):
                 break
     if ((len(Your_EncodedValues) != len(expectedEncodedValues)) or (
             len(Your_QuantizedValues) != len(expectedQuantizedValues))):
-
-        print(f"{len(Your_EncodedValues)}  ==>  {len(expectedEncodedValues)}")
-        print(f"{len(Your_QuantizedValues)}  ==>  {len(expectedQuantizedValues)}")
-
         return "QuantizationTest1 Test case failed, your signal have different length from the expected one"
 
     for i in range(len(Your_EncodedValues)):
@@ -104,10 +100,6 @@ def QuantizationTest2(file_name, Your_IntervalIndices, Your_EncodedValues, Your_
             or len(Your_EncodedValues) != len(expectedEncodedValues)
             or len(Your_QuantizedValues) != len(expectedQuantizedValues)
             or len(Your_SampledError) != len(expectedSampledError)):
-        print(f"{len(Your_IntervalIndices)}  ==>  {len(expectedIntervalIndices)}")
-        print(f"{len(Your_EncodedValues)}  ==>  {len(expectedEncodedValues)}")
-        print(f"{len(Your_QuantizedValues)}  ==>  {len(expectedQuantizedValues)}")
-        print(f"{len(Your_SampledError)}  ==>  {len(expectedSampledError)}")
         return "QuantizationTest2 Test case failed, your signal have different length from the expected one"
 
     for i in range(len(Your_IntervalIndices)):

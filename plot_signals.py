@@ -111,7 +111,7 @@ class SignalsMethods:
         interval_index = []
         xqn = []
         all_encodes = []
-        print(intervals)
+
         for i in range(len(values)):
 
             for index, interval in enumerate(intervals):
