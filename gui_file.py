@@ -4,6 +4,7 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
 from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2
+import pandas as pd
 
 
 class Task1dot1:
@@ -373,6 +374,16 @@ class Task3:
         self.interval_index, self.encoded_values, self.xqn, self.errorofn = signal_plot.SignalsMethods.quantize_signal(
             self.levels_or_bits, self.values,
             self.number_of_levels_or_bits)
+        data = {"Interval Index": self.interval_index,
+                "Encoded Values": self.encoded_values,
+                "Quantized Values": self.xqn,
+                "Error Values": self.errorofn}
+
+        # Convert the dictionary to a pandas DataFrame
+        df = pd.DataFrame(data)
+        for index, row in df.iterrows():
+            self.tree.insert("", tk.END, text=index, values=(
+                row["Interval Index"], row["Encoded Values"], row["Quantized Values"], row['Error Values']))
 
     def test_quantized_signal_one(self):
         self.quantize_signal()
@@ -417,7 +428,25 @@ class Task3:
         self.choose1_btn = tk.Button(self.button_frame, text='Test Quantized Signal Two',
                                      command=self.test_quantized_signal_two)
         self.choose1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=15, pady=18)
+        self.tree = ttk.Treeview(self.button_frame)
+        self.tree["columns"] = ("Interval Index", "Encoded Values", "Quantized Values", "Error Values")
+
+        # Format the columns
+        self.tree.column("#0", width=110, stretch=tk.NO, anchor="center")
+        self.tree.column("Interval Index", width=100, anchor="center")
+        self.tree.column("Encoded Values", width=100, anchor="center")
+        self.tree.column("Quantized Values", width=100, anchor="center")
+        self.tree.column("Error Values", width=100, anchor="center")
+
+        # Add headings for the columns
+        self.tree.heading("#0", text="Number of sample", anchor=tk.CENTER)
+        self.tree.heading("Interval Index", text="Interval Index", anchor=tk.CENTER)
+        self.tree.heading("Encoded Values", text="Encoded Values", anchor=tk.CENTER)
+        self.tree.heading("Quantized Values", text="Quantized Values", anchor=tk.CENTER)
+        self.tree.heading("Error Values", text="Error Values", anchor=tk.CENTER)
+        self.tree.grid(row=4, sticky=tk.W + tk.E, pady=18, padx=8 )
         self.button_frame.pack(fill='x', pady=15)
+
         self.root.mainloop()
 
 
