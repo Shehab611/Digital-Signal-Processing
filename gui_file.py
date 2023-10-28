@@ -382,7 +382,7 @@ class Task3:
         # Convert the dictionary to a pandas DataFrame
         df = pd.DataFrame(data)
         for index, row in df.iterrows():
-            self.tree.insert("", tk.END, text=index, values=(
+            self.tree.insert("", tk.END, text=str(index), values=(
                 row["Interval Index"], row["Encoded Values"], row["Quantized Values"], row['Error Values']))
 
     def test_quantized_signal_one(self):
@@ -444,7 +444,7 @@ class Task3:
         self.tree.heading("Encoded Values", text="Encoded Values", anchor=tk.CENTER)
         self.tree.heading("Quantized Values", text="Quantized Values", anchor=tk.CENTER)
         self.tree.heading("Error Values", text="Error Values", anchor=tk.CENTER)
-        self.tree.grid(row=4, sticky=tk.W + tk.E, pady=18, padx=8 )
+        self.tree.grid(row=4, sticky=tk.W + tk.E, pady=18, padx=8)
         self.button_frame.pack(fill='x', pady=15)
 
         self.root.mainloop()
