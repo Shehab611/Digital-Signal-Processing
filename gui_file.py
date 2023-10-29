@@ -361,8 +361,22 @@ class Task2:
 
 
 class Task3:
+    def signal_representation(self):
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, self.values, 'Samples',
+                                                      'Amplitude',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal Before Quantization')
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, self.xqn, 'Samples',
+                                                      'Amplitude',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal After Quantization')
+        plt.tight_layout()
+        plt.show()
+
     def choose_signal_one(self):
-        signal_type, is_periodic_one, num_samples_one, indexes, self.values = (
+        signal_type, is_periodic_one, num_samples_one, self.indexes, self.values = (
             signal_plot.SignalsMethods.read_signal())
 
     def get_data(self):
@@ -384,6 +398,7 @@ class Task3:
         for index, row in df.iterrows():
             self.tree.insert("", tk.END, text=str(index), values=(
                 row["Interval Index"], row["Encoded Values"], row["Quantized Values"], row['Error Values']))
+        self.signal_representation()
 
     def test_quantized_signal_one(self):
         self.quantize_signal()
@@ -399,6 +414,7 @@ class Task3:
 
     def __init__(self):
         self.values = None
+        self.indexes = None
         self.number_of_levels_or_bits = None
         self.levels_or_bits = None
         self.interval_index, self.encoded_values, self.xqn, self.errorofn = None, None, None, None
