@@ -108,6 +108,11 @@ def QuantizationTest2(file_name, Your_IntervalIndices, Your_EncodedValues, Your_
 
     for i in range(len(Your_EncodedValues)):
         if Your_EncodedValues[i] != expectedEncodedValues[i]:
+            print(type(Your_EncodedValues[i]))
+            print(Your_EncodedValues[i])
+            print(type(expectedEncodedValues[i]))
+            print(expectedEncodedValues[i])
+
             return (
                 "QuantizationTest2 Test case failed, your EncodedValues have different EncodedValues from the "
                 "expected one")

@@ -398,7 +398,7 @@ class Task3:
         for index, row in df.iterrows():
             self.tree.insert("", tk.END, text=str(index), values=(
                 row["Interval Index"], row["Encoded Values"], row["Quantized Values"], row['Error Values']))
-        self.signal_representation()
+      #  self.signal_representation()
 
     def test_quantized_signal_one(self):
         self.quantize_signal()

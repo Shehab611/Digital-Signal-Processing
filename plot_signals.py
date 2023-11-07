@@ -102,29 +102,92 @@ class SignalsMethods:
         while value < max_ampl:
             intervals.append([float(value), float(value + resolution)])
             value += resolution
-        # encoding signal
-        binary_values = [bin(i)[2:].zfill(int(encoded_bits)) for i in range(2 ** int(encoded_bits))]
-        int_values = [int(b, 2) + 1 for b in binary_values]
-        encoded_values = dict(zip(int_values, binary_values))
 
         # interval index
         interval_index = []
         xqn = []
         all_encodes = []
 
-        for i in range(len(values)):
-
-            for index, interval in enumerate(intervals):
-                if interval[0] <= values[i] <= interval[1]:
-                    interval_index.append(index + 1)
+        for i in values:
+            for interval in intervals:
+                if interval[0] <= i <= interval[1]:
                     xqn.append(float(Decimal((Decimal(interval[0]) + Decimal(interval[1])) / 2)))
-                    all_encodes.append(encoded_values[index + 1])
+                    index = intervals.index(interval)
+                    interval_index.append(index + 1)
+                    frmt = "{0:0%sb}" % int(encoded_bits)
+                    encoded = frmt.format(index)
+                    all_encodes.append(encoded)
                     break
 
         # Get Error
         getcontext().prec = 3
-        errorofn = [float(Decimal(er) - Decimal(xn)) for er, xn in zip(xqn, values)]
+        errorofn = []
+        for i in range(len(xqn)):
+            errorofn.append(float(Decimal(xqn[i]) - Decimal(values[i])))
+
         return interval_index, all_encodes, xqn, errorofn
+
+
+class FourierTransform:
+    @staticmethod
+    def calculate_dft_and_idft(values):
+        output = []
+        for k in range(len(values)):
+            output.append(FourierTransform.calculate_harmonic(k, values))
+
+        return output
+
+    @staticmethod
+    def calculate_harmonic(k, values):
+        N = len(values)
+        summ = 0
+        for n in range(N):
+            summ += FourierTransform.calculate_one_element(n, k, values)
+        return summ
+
+    @staticmethod
+    def calculate_one_element(n, k, values):
+        if values[n] == 0:
+            return 0
+        return values[n] * FourierTransform.calculate_exp(n, k, len(values))
+
+    @staticmethod
+    def calculate_exp(n, k, N):
+        the_power = (-1j * 2 * n * k) / N
+        if the_power.imag == 0:
+            return 1 + 0j
+        sin_value = float(math.sin(math.pi * the_power.imag.__abs__()))
+        cos_value = float(math.cos(math.pi * the_power.imag.__abs__()))
+        sin_value *= -1j
+        e = cos_value + sin_value
+
+        return e
+
+    @staticmethod
+    def calculate_fundamentel_freq(sampling_freq, len_of_values):
+        periodic_time_of_sample = 1 / sampling_freq
+        down_term = len_of_values * periodic_time_of_sample
+        up_term = 2 * math.pi
+        return up_term / down_term
+
+    @staticmethod
+    def calculate_ampl(dft):
+        ampl = []
+        for i in range(len(dft)):
+            the_powered_real_number = dft[i].real * dft[i].real
+            the_powered_imag_number = dft[i].imag * dft[i].imag
+            summ = the_powered_real_number + the_powered_imag_number
+            ampl.append(math.sqrt(summ))
+        return ampl
+
+    @staticmethod
+    def calculate_phase_shift(dft):
+        phases = []
+        for i in range(len(dft)):
+            frac = dft[i].imag / dft[i].real
+            value_in_degree = math.degrees(math.atan(frac))
+            phases.append(value_in_degree)
+        return phases
 
 
 class SignalType(Enum):
