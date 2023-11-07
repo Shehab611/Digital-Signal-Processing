@@ -153,7 +153,7 @@ class FourierTransform:
 
     @staticmethod
     def calculate_exp(n, k, N):
-        the_power = (-1j * 2 * n * k) / N
+        the_power = (1j * 2 * n * k) / N
         if the_power.imag == 0:
             return 1 + 0j
         sin_value = float(math.sin(math.pi * the_power.imag.__abs__()))
@@ -177,16 +177,16 @@ class FourierTransform:
             the_powered_real_number = dft[i].real * dft[i].real
             the_powered_imag_number = dft[i].imag * dft[i].imag
             summ = the_powered_real_number + the_powered_imag_number
-            ampl.append(math.sqrt(summ))
+            ampl.append(math.sqrt(float(summ)))
         return ampl
 
     @staticmethod
     def calculate_phase_shift(dft):
         phases = []
         for i in range(len(dft)):
-            frac = dft[i].imag / dft[i].real
-            value_in_degree = math.degrees(math.atan(frac))
-            phases.append(value_in_degree)
+            # frac = dft[i].imag / dft[i].real
+            # value_in_degree = math.degrees(math.atan(frac))
+            phases.append(float(math.atan2(dft[i].imag, dft[i].real)))
         return phases
 
 
