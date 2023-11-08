@@ -129,36 +129,51 @@ class SignalsMethods:
 
 
 class FourierTransform:
+
     @staticmethod
-    def calculate_dft_and_idft(values):
+    def calculate_dft_and_idft(values, type_of_calc):
         output = []
         for k in range(len(values)):
-            output.append(FourierTransform.calculate_harmonic(k, values))
+            harmonic = FourierTransform.calculate_harmonic_or_element(k, values, type_of_calc)
+            if type_of_calc == 'idft':
+                output.append(int(harmonic.real))
+            else:
+                output.append(harmonic)
+
 
         return output
 
     @staticmethod
-    def calculate_harmonic(k, values):
+    def calculate_harmonic_or_element(k, values, type_of_calc):
         N = len(values)
         summ = 0
         for n in range(N):
-            summ += FourierTransform.calculate_one_element(n, k, values)
+            summ += FourierTransform.calculate_one_element(n, k, values, type_of_calc)
+        if type_of_calc == 'idft':
+            return summ * (1 / N)
         return summ
 
     @staticmethod
-    def calculate_one_element(n, k, values):
+    def calculate_one_element(n, k, values, type_of_calc):
         if values[n] == 0:
             return 0
-        return values[n] * FourierTransform.calculate_exp(n, k, len(values))
+        rtn = values[n] * FourierTransform.calculate_exp(n, k, len(values), type_of_calc)
+        if type_of_calc == 'idft':
+            rtn = (rtn.real.__round__()+(rtn.imag.__round__() * 1j))
+        return rtn
 
     @staticmethod
-    def calculate_exp(n, k, N):
+    def calculate_exp(n, k, N, type_of_calc):
         the_power = (1j * 2 * n * k) / N
         if the_power.imag == 0:
             return 1 + 0j
         sin_value = float(math.sin(math.pi * the_power.imag.__abs__()))
         cos_value = float(math.cos(math.pi * the_power.imag.__abs__()))
-        sin_value *= -1j
+        if type_of_calc == 'dft':
+            sin_value *= -1j
+        else:
+            cos_value = cos_value.__round__()
+            sin_value *= 1j
         e = cos_value + sin_value
 
         return e
@@ -188,6 +203,38 @@ class FourierTransform:
             # value_in_degree = math.degrees(math.atan(frac))
             phases.append(float(math.atan2(dft[i].imag, dft[i].real)))
         return phases
+
+    @staticmethod
+    def signal_representation(x, amp_y, theta_y):
+        plt.subplot(2, 1, 1)
+        SignalsMethods.plot_normal_signal(x, amp_y, 'Frequency',
+                                          'Amplitude',
+                                          SignalType.Discrete,
+                                          'Frequency Domain with Amplitude')
+        plt.subplot(2, 1, 2)
+        SignalsMethods.plot_normal_signal(x, theta_y, 'Frequency',
+                                          'Phase Shift',
+                                          SignalType.Discrete,
+                                          'Frequency Domain with Phase Shift')
+        plt.tight_layout()
+        plt.show()
+
+    @staticmethod
+    def plot_freq_domain(folding_freq, amp_y, theta_y):
+        x = []
+        for i in range(len(amp_y)):
+            x.append(i * folding_freq)
+        FourierTransform.signal_representation(x, amp_y, theta_y)
+
+    @staticmethod
+    def convert_from_polar_form(ampl, theta):
+        outputs = []
+        for i in range(len(ampl)):
+            img = ampl[i] * math.sin(theta[i]) * 1j
+            real = ampl[i] * math.cos(theta[i])
+            complex_num = img + real
+            outputs.append(complex_num)
+        return outputs
 
 
 class SignalType(Enum):
