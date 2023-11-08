@@ -1,3 +1,6 @@
+import math
+
+
 def signal_samples_are_equal(file_name, samples):
     expected_indices = []
     expected_samples = []
@@ -131,3 +134,31 @@ def QuantizationTest2(file_name, Your_IntervalIndices, Your_EncodedValues, Your_
             return "QuantizationTest2 Test case failed, your SampledError have different values from the expected one"
 
     return "QuantizationTest2 Test case passed successfully"
+
+
+# Use to test the Amplitude of DFT and IDFT
+def SignalComapreAmplitude(SignalInput=[], SignalOutput=[]):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        for i in range(len(SignalInput)):
+            if abs(SignalInput[i] - SignalOutput[i]) > 0.001:
+                return False
+            elif SignalInput[i] != SignalOutput[i]:
+                return False
+        return True
+
+
+# Use to test the PhaseShift of DFT
+def SignalComaprePhaseShift(SignalInput=[], SignalOutput=[]):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        for i in range(len(SignalInput)):
+            A = round(SignalInput[i])
+            B = round(SignalOutput[i])
+            if abs(A - B) > 0.0001:
+                return False
+            elif A != B:
+                return False
+        return True

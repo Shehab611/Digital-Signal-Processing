@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
-from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2
+from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, SignalComapreAmplitude
 import pandas as pd
 
 
@@ -398,7 +398,8 @@ class Task3:
         for index, row in df.iterrows():
             self.tree.insert("", tk.END, text=str(index), values=(
                 row["Interval Index"], row["Encoded Values"], row["Quantized Values"], row['Error Values']))
-      #  self.signal_representation()
+
+    #  self.signal_representation()
 
     def test_quantized_signal_one(self):
         self.quantize_signal()
@@ -466,6 +467,122 @@ class Task3:
         self.root.mainloop()
 
 
+def save_file_in_polar(ampl, phase):
+    with open('polar_form.txt', 'w') as file:
+        file.write('0 \n')
+        file.write('1 \n')
+        file.write(f'{len(ampl)}\n')
+        for i in range(len(ampl)):
+            file.write(f'{ampl[i]} {phase[i]}\n')
+
+
+def save_file(data):
+    with open('data.txt', 'w') as file:
+        file.write('0 \n')
+        file.write('0 \n')
+        file.write(f'{len(data)}\n')
+        for i in range(len(data)):
+            file.write(f'{i} {data[i]}\n')
+
+
+class Task4:
+    def read_signal(self):
+        signal_one_type, self.signal_type, num_samples_one, self.signal_ampl, self.signal_phase = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def calculate(self):
+        if self.signal_type == 0:
+            self.sampling_freq_value = float(self.sampling_freq.get())
+            type_of_calc = 'dft'
+            values = self.signal_phase
+            fundamentel_freq = signal_plot.FourierTransform.calculate_fundamentel_freq(self.sampling_freq_value,
+                                                                                       len(values))
+            data = signal_plot.FourierTransform.calculate_dft_and_idft(values, type_of_calc)
+
+            x = signal_plot.FourierTransform.calculate_ampl(data)
+            y = signal_plot.FourierTransform.calculate_phase_shift(data)
+            save_file(data)
+            save_file_in_polar(x, y)
+            self.edit_ampl = self.edit_ampll.get()
+            self.edit_theta = self.edit_phase.get()
+            if self.edit_ampl and self.edit_theta:
+                for i in range(len(x)):
+                    x[i] *= int(self.edit_ampl)
+                for i in range(len(y)):
+                    y[i] *= int(self.edit_theta)
+            elif self.edit_theta:
+                for i in range(len(y)):
+                    y[i] *= int(self.edit_theta)
+            elif self.edit_ampl:
+                for i in range(len(x)):
+                    x[i] *= int(self.edit_ampl)
+
+            signal_plot.FourierTransform.plot_freq_domain(fundamentel_freq, x, y)
+        else:
+            type_of_calc = 'idft'
+            values = signal_plot.FourierTransform.convert_from_polar_form(self.signal_ampl, self.signal_phase)
+            print(values)
+            data = signal_plot.FourierTransform.calculate_dft_and_idft(values, type_of_calc)
+            signal_plot.FourierTransform.plot_time_domain(data)
+
+    def test_fun(self):
+        # in output file second row if zero work dft else work idft
+        values = self.signal_phase
+        data = signal_plot.FourierTransform.calculate_dft_and_idft(values, 'dft')
+        x = signal_plot.FourierTransform.calculate_ampl(data)
+        y = signal_plot.FourierTransform.calculate_phase_shift(data)
+
+        print(SignalComapreAmplitude(x, x))
+
+    def reconstruct(self):
+        signal = open("data.txt")
+        int(signal.readline().strip())
+        int(signal.readline().strip())
+        num_samples = int(signal.readline().strip())
+        values = []
+        for i in range(int(num_samples)):
+            values.append(complex(signal.readline().strip().split()[1]))
+
+        x = signal_plot.FourierTransform.calculate_dft_and_idft(values, 'idft')
+        signal_plot.FourierTransform.plot_time_domain(x)
+
+    def __init__(self):
+        self.signal_type = None
+        self.signal_ampl = None
+        self.signal_phase = None
+        self.sampling_freq_value = None
+        self.edit_ampl = None
+        self.edit_theta = None
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        label = tk.Label(self.button_frame, text="Enter Sampling Frequency", font=('Arial', 16))
+        label.grid(row=0, column=0, sticky=tk.W)
+        self.sampling_freq = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.sampling_freq.grid(row=0, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Choose Signal', command=self.read_signal)
+        self.choose1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
+        self.choose2_btn = tk.Button(self.button_frame, text='Calculate', command=self.calculate)
+        self.choose2_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
+        self.add_signal_btn = tk.Button(self.button_frame, text='Reconstruct Signal By IDFT', command=self.reconstruct)
+        self.add_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
+        self.subtract_signal_btn = tk.Button(self.button_frame, text='Test', command=self.test_fun)
+        self.subtract_signal_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=40)
+        label = tk.Label(self.button_frame, text="Enter Amplitude ", font=('Arial', 16))
+        label.grid(row=3, column=0, sticky=tk.W)
+        self.edit_ampll = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.edit_ampll.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        label = tk.Label(self.button_frame, text="Enter Phase Shift ", font=('Arial', 16))
+        label.grid(row=4, column=0, sticky=tk.W)
+        self.edit_phase = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.edit_phase.grid(row=4, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.button_frame.pack(fill='x', pady=15)
+
+        self.root.mainloop()
+
 
 class MainGui:
 
@@ -479,6 +596,9 @@ class MainGui:
         def open_task_three():
             Task3()
 
+        def open_task_four():
+            Task4()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -491,5 +611,7 @@ class MainGui:
         self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 3', command=open_task_three)
         self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 4', command=open_task_four)
+        self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

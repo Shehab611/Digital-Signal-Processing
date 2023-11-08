@@ -1,14 +1,15 @@
-import math
+import gui_file as gui
 
-from plot_signals import SignalsMethods, FourierTransform
+from plot_signals import FourierTransform
 
-# import gui_file as gui
+gui.MainGui()
 
-# gui.MainGui()
+x = [(64+0j), (-7.999999999999976+19.313708498984745j), (-8.000000000000071+7.999999999999986j), (-8.000000000000002+3.3137084989847536j), (-8-2.5848713190921388e-14j), (-8.000000000000002-3.3137084989847536j), (-8.000000000000071-7.999999999999986j), (-7.999999999999976-19.313708498984745j)]
+data = FourierTransform.calculate_dft_and_idft(x, 'idft')
+#print(data)
+signal = open("data.txt")
+u = signal.readline().strip()
+u = signal.readline().strip()
+u = signal.readline().strip()
 
-ampl = [64.0, 20.905007438022025, 11.313708498984761, 8.659137602339156, 8.0, 8.659137602339177, 11.31370849898479, 20.905007438021983]
-theta = [0.0, 1.9634954084936211, 2.3561944901923453, 2.748893571891068, -3.1415926535897922, -2.7488935718910676, -2.356194490192346, -1.963495408493619]
 
-values = FourierTransform.convert_from_polar_form(ampl,theta)
-f = FourierTransform.calculate_dft_and_idft(values,'idft')
-print(f)

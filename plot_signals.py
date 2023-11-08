@@ -219,10 +219,10 @@ class FourierTransform:
         plt.show()
 
     @staticmethod
-    def plot_freq_domain(folding_freq, amp_y, theta_y):
+    def plot_freq_domain(fundamentel_freq, amp_y, theta_y):
         x = []
         for i in range(len(amp_y)):
-            x.append(i * folding_freq)
+            x.append(i * fundamentel_freq)
         FourierTransform.signal_representation(x, amp_y, theta_y)
 
     @staticmethod
