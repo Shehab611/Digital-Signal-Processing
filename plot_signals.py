@@ -140,7 +140,6 @@ class FourierTransform:
             else:
                 output.append(harmonic)
 
-
         return output
 
     @staticmethod
@@ -159,7 +158,7 @@ class FourierTransform:
             return 0
         rtn = values[n] * FourierTransform.calculate_exp(n, k, len(values), type_of_calc)
         if type_of_calc == 'idft':
-            rtn = (rtn.real.__round__()+(rtn.imag.__round__() * 1j))
+            rtn = (rtn.real.__round__() + (rtn.imag.__round__() * 1j))
         return rtn
 
     @staticmethod
@@ -225,6 +224,16 @@ class FourierTransform:
         for i in range(len(amp_y)):
             x.append(i * folding_freq)
         FourierTransform.signal_representation(x, amp_y, theta_y)
+
+    @staticmethod
+    def plot_time_domain(y):
+        x = []
+        for i in range(len(y)):
+            x.append(i)
+
+        SignalsMethods.plot_normal_signal(x, y, 'time', 'samples', SignalType.Discrete, 'Time Domain')
+        plt.tight_layout()
+        plt.show()
 
     @staticmethod
     def convert_from_polar_form(ampl, theta):
