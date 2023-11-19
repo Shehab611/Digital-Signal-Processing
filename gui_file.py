@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
-from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, SignalComapreAmplitude
+from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2
 import pandas as pd
 
 
@@ -485,6 +485,31 @@ def save_file(data):
             file.write(f'{i} {data[i]}\n')
 
 
+def read_dft_test_signal():
+    signal = open('Output_Signal_DFT_A,Phase.txt')
+    # define the signal
+    signal_type = int(signal.readline().strip())
+    is_periodic = int(signal.readline().strip())
+    num_samples = int(signal.readline().strip())
+    samples = [list(map(float, line.strip().split())) for line in signal]
+    indexes = [sample[0] for sample in samples]
+    values = [sample[1] for sample in samples]
+    return signal_type, is_periodic, num_samples, indexes, values
+
+
+def reconstruct():
+    signal = open("data.txt")
+    int(signal.readline().strip())
+    int(signal.readline().strip())
+    num_samples = int(signal.readline().strip())
+    values = []
+    for i in range(int(num_samples)):
+        values.append(complex(signal.readline().strip().split()[1]))
+
+    x = signal_plot.FourierTransform.calculate_dft_and_idft(values, 'idft')
+    signal_plot.FourierTransform.plot_time_domain(x)
+
+
 class Task4:
     def read_signal(self):
         signal_one_type, self.signal_type, num_samples_one, self.signal_ampl, self.signal_phase = (
@@ -525,27 +550,6 @@ class Task4:
             data = signal_plot.FourierTransform.calculate_dft_and_idft(values, type_of_calc)
             signal_plot.FourierTransform.plot_time_domain(data)
 
-    def test_fun(self):
-        # in output file second row if zero work dft else work idft
-        values = self.signal_phase
-        data = signal_plot.FourierTransform.calculate_dft_and_idft(values, 'dft')
-        x = signal_plot.FourierTransform.calculate_ampl(data)
-        y = signal_plot.FourierTransform.calculate_phase_shift(data)
-
-        print(SignalComapreAmplitude(x, x))
-
-    def reconstruct(self):
-        signal = open("data.txt")
-        int(signal.readline().strip())
-        int(signal.readline().strip())
-        num_samples = int(signal.readline().strip())
-        values = []
-        for i in range(int(num_samples)):
-            values.append(complex(signal.readline().strip().split()[1]))
-
-        x = signal_plot.FourierTransform.calculate_dft_and_idft(values, 'idft')
-        signal_plot.FourierTransform.plot_time_domain(x)
-
     def __init__(self):
         self.signal_type = None
         self.signal_ampl = None
@@ -567,10 +571,8 @@ class Task4:
         self.choose1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
         self.choose2_btn = tk.Button(self.button_frame, text='Calculate', command=self.calculate)
         self.choose2_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
-        self.add_signal_btn = tk.Button(self.button_frame, text='Reconstruct Signal By IDFT', command=self.reconstruct)
+        self.add_signal_btn = tk.Button(self.button_frame, text='Reconstruct Signal By IDFT', command=reconstruct)
         self.add_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
-        self.subtract_signal_btn = tk.Button(self.button_frame, text='Test', command=self.test_fun)
-        self.subtract_signal_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=40)
         label = tk.Label(self.button_frame, text="Enter Amplitude ", font=('Arial', 16))
         label.grid(row=3, column=0, sticky=tk.W)
         self.edit_ampll = tk.Entry(self.button_frame, font=('Arial', 16))
