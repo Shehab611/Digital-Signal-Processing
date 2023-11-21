@@ -476,8 +476,8 @@ def save_file_in_polar(ampl, phase):
             file.write(f'{ampl[i]} {phase[i]}\n')
 
 
-def save_file(data):
-    with open('data.txt', 'w') as file:
+def save_file(data, file_name):
+    with open(file_name, 'w') as file:
         file.write('0 \n')
         file.write('0 \n')
         file.write(f'{len(data)}\n')
@@ -511,6 +511,7 @@ def reconstruct():
 
 
 class Task4:
+
     def read_signal(self):
         signal_one_type, self.signal_type, num_samples_one, self.signal_ampl, self.signal_phase = (
             signal_plot.SignalsMethods.read_signal())
@@ -526,7 +527,7 @@ class Task4:
 
             x = signal_plot.FourierTransform.calculate_ampl(data)
             y = signal_plot.FourierTransform.calculate_phase_shift(data)
-            save_file(data)
+            save_file(data, 'data.txt')
             save_file_in_polar(x, y)
             self.edit_ampl = self.edit_ampll.get()
             self.edit_theta = self.edit_phase.get()
@@ -586,6 +587,62 @@ class Task4:
         self.root.mainloop()
 
 
+class Task5:
+    def signal_representation(self, y):
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, self.signal_values, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal Before DCT')
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, y, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal After DCT')
+        plt.tight_layout()
+        plt.show()
+
+    def read_signal(self):
+        _, _, _, self.indexes, self.signal_values = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def calculate_dct(self):
+        y = signal_plot.DCTTransform.dct_transform(self.signal_values)
+        self.signal_representation(y)
+        x = int(self.coefficients.get())
+        save_file(y[:x],'dct_coefficients,txt')
+        test_result = signal_samples_are_equal('DCT_output.txt', y)
+        messagebox.showinfo(title='Test Case Result', message=test_result)
+
+    def remove_dc(self):
+        y = signal_plot.DCTTransform.remove_dc_component(self.signal_values)
+        test_result = signal_samples_are_equal('DC_component_output.txt', y)
+        messagebox.showinfo(title='Test Case Result', message=test_result)
+    def __init__(self):
+        self.signal_values = None
+        self.indexes = None
+        self.coefficients_value = None
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        label = tk.Label(self.button_frame, text="Enter First Coefficients to be Saved ", font=('Arial', 16))
+        label.grid(row=0, column=0, sticky=tk.W)
+        self.coefficients = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.coefficients.grid(row=0, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Choose Signal', command=self.read_signal)
+        self.choose1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
+        self.choose2_btn = tk.Button(self.button_frame, text='Calculate DCT', command=self.calculate_dct)
+        self.choose2_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
+        self.add_signal_btn = tk.Button(self.button_frame, text='Remove DC Component',command=self.remove_dc )
+        self.add_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
+        self.button_frame.pack(fill='x', pady=15)
+
+        self.root.mainloop()
+
+
 class MainGui:
 
     def __init__(self):
@@ -601,6 +658,9 @@ class MainGui:
         def open_task_four():
             Task4()
 
+        def open_task_five():
+            Task5()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -615,5 +675,7 @@ class MainGui:
         self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 4', command=open_task_four)
         self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 5', command=open_task_five)
+        self.task1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
