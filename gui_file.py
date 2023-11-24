@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
-from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2
+from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, Shift_Fold_Signal, ConvTest
 import pandas as pd
 
 
@@ -172,7 +172,7 @@ class Task1dot2:
         self.generate_signal()
 
         if self.selected_option == 'sine':
-            test_message = signal_samples_are_equal('SinOutput.txt', self.y_axis)
+            test_message = signal_samples_are_equal('test_outputs/SinOutput.txt', self.y_axis)
         else:
             test_message = signal_samples_are_equal('CosOutput.txt', self.y_axis)
 
@@ -404,12 +404,13 @@ class Task3:
     def test_quantized_signal_one(self):
         self.quantize_signal()
 
-        test_message = QuantizationTest1("Quan1_Out.txt", self.encoded_values, self.xqn)
+        test_message = QuantizationTest1("test_outputs/Quan1_Out.txt", self.encoded_values, self.xqn)
         messagebox.showinfo(title='Test Case Result', message=test_message)
 
     def test_quantized_signal_two(self):
         self.quantize_signal()
-        test_message = QuantizationTest2("Quan2_Out.txt", self.interval_index, self.encoded_values, self.xqn,
+        test_message = QuantizationTest2("test_outputs/Quan2_Out.txt", self.interval_index, self.encoded_values,
+                                         self.xqn,
                                          self.errorofn)
         messagebox.showinfo(title='Test Case Result', message=test_message)
 
@@ -486,7 +487,7 @@ def save_file(data, file_name):
 
 
 def read_dft_test_signal():
-    signal = open('Output_Signal_DFT_A,Phase.txt')
+    signal = open('test_outputs/Output_Signal_DFT_A,Phase.txt')
     # define the signal
     signal_type = int(signal.readline().strip())
     is_periodic = int(signal.readline().strip())
@@ -610,14 +611,15 @@ class Task5:
         y = signal_plot.DCTTransform.dct_transform(self.signal_values)
         self.signal_representation(y)
         x = int(self.coefficients.get())
-        save_file(y[:x],'dct_coefficients,txt')
-        test_result = signal_samples_are_equal('DCT_output.txt', y)
+        save_file(y[:x], 'dct_coefficients.txt')
+        test_result = signal_samples_are_equal('test_outputs/DCT_output.txt', y)
         messagebox.showinfo(title='Test Case Result', message=test_result)
 
     def remove_dc(self):
         y = signal_plot.DCTTransform.remove_dc_component(self.signal_values)
-        test_result = signal_samples_are_equal('DC_component_output.txt', y)
+        test_result = signal_samples_are_equal('test_outputs/DC_component_output.txt', y)
         messagebox.showinfo(title='Test Case Result', message=test_result)
+
     def __init__(self):
         self.signal_values = None
         self.indexes = None
@@ -636,8 +638,113 @@ class Task5:
         self.choose1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
         self.choose2_btn = tk.Button(self.button_frame, text='Calculate DCT', command=self.calculate_dct)
         self.choose2_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
-        self.add_signal_btn = tk.Button(self.button_frame, text='Remove DC Component',command=self.remove_dc )
+        self.add_signal_btn = tk.Button(self.button_frame, text='Remove DC Component', command=self.remove_dc)
         self.add_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
+        self.button_frame.pack(fill='x', pady=15)
+
+        self.root.mainloop()
+
+
+class Task6:
+    def signal_representation(self, y):
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, self.signal_values, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal Before DCT')
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.indexes, y, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal After DCT')
+        plt.tight_layout()
+        plt.show()
+
+    def read_signal(self):
+        _, _, _, self.indexes, self.signal_values = (
+            signal_plot.SignalsMethods.read_signal())
+
+    def calculate_smoothing(self):
+        k = int(self.window_size.get())
+        x = signal_plot.TaskSix.smoothing_signal(self.signal_values, k)
+
+    @staticmethod
+    def calculate_sharpening():
+        tt = signal_plot.TaskSix.derivative_signal()
+        messagebox.showinfo(title='Test Case Result', message=tt)
+
+    def calculate_shifting(self):
+        steps = int(self.shifting_steps.get())
+        x = signal_plot.TaskSix.shifting_signal(self.indexes, steps, False)
+        self.signal_representation(x)
+
+    def folding_signal(self):
+        x = signal_plot.TaskSix.folding_signal(self.signal_values)
+        self.signal_representation(x)
+        msg = Shift_Fold_Signal('test_outputs/Output_fold.txt', self.indexes, x)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def shift_folding_byn500(self):
+        x = signal_plot.TaskSix.folding_signal(self.signal_values)
+        y = signal_plot.TaskSix.shifting_signal(self.indexes, -500, True)
+        self.signal_representation(y)
+        msg = Shift_Fold_Signal('test_outputs/Output_ShiftFoldedby-500.txt', y, x)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def shift_folding_by500(self):
+        x = signal_plot.TaskSix.folding_signal(self.signal_values)
+        y = signal_plot.TaskSix.shifting_signal(self.indexes, 500, True)
+        self.signal_representation(y)
+        msg = Shift_Fold_Signal('test_outputs/Output_ShifFoldedby500.txt', y, x)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def remove_dc_component(self):
+        tt = signal_plot.TaskSix.remove_dc(self.signal_values)
+        self.signal_representation(tt)
+        test_result = signal_samples_are_equal('test_outputs/DC_component_output.txt', tt)
+        messagebox.showinfo(title='Test Case Result', message=test_result)
+
+    @staticmethod
+    def calculate_convolve():
+        x, y = signal_plot.TaskSix.convolve()
+        msg = ConvTest(x, y)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def __init__(self):
+        self.signal_values = None
+        self.indexes = None
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        label = tk.Label(self.button_frame, text="Enter Window Size ", font=('Arial', 16))
+        label.grid(row=0, column=0, sticky=tk.W)
+        self.window_size = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.window_size.grid(row=0, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Choose Signal', command=self.read_signal)
+        self.choose1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
+        self.choose2_btn = tk.Button(self.button_frame, text='Calculate Smoothing', command=self.calculate_smoothing)
+        self.choose2_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
+        self.add_signal_btn = tk.Button(self.button_frame, text='Calculate Sharping', command=self.calculate_sharpening)
+        self.add_signal_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=40)
+        label = tk.Label(self.button_frame, text="Enter shifting steps ", font=('Arial', 16))
+        label.grid(row=3, column=0, sticky=tk.W)
+        self.shifting_steps = tk.Entry(self.button_frame, font=('Arial', 16))
+        self.shifting_steps.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Calculate Shifting', command=self.calculate_shifting)
+        self.choose1_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Folding Signal', command=self.folding_signal)
+        self.choose1_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Shift Folding by 500', command=self.shift_folding_by500)
+        self.choose1_btn.grid(row=5, column=0, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Shift Folding by -500', command=self.shift_folding_byn500)
+        self.choose1_btn.grid(row=5, column=1, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Remove Dc Component', command=self.remove_dc_component)
+        self.choose1_btn.grid(row=6, column=0, sticky=tk.W + tk.E, padx=10, pady=18)
+        self.choose1_btn = tk.Button(self.button_frame, text='Calculate Convolve', command=self.calculate_convolve)
+        self.choose1_btn.grid(row=6, column=1, sticky=tk.W + tk.E, padx=10, pady=18)
         self.button_frame.pack(fill='x', pady=15)
 
         self.root.mainloop()
@@ -661,6 +768,9 @@ class MainGui:
         def open_task_five():
             Task5()
 
+        def open_task_six():
+            Task6()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -677,5 +787,7 @@ class MainGui:
         self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 5', command=open_task_five)
         self.task1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 6', command=open_task_six)
+        self.task1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

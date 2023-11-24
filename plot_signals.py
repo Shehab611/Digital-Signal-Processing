@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from enum import Enum
 import numpy as np
 
+from DerivativeSignal import DerivativeSignal
+
 
 class SignalsMethods:
     @staticmethod
@@ -42,6 +44,18 @@ class SignalsMethods:
     @staticmethod
     def read_signal():
         signal = filedialog.askopenfile(filetypes=[("txt", "*.txt")])
+        # define the signal
+        signal_type = int(signal.readline().strip())
+        is_periodic = int(signal.readline().strip())
+        num_samples = int(signal.readline().strip())
+        samples = [list(map(float, line.strip().split())) for line in signal]
+        indexes = [sample[0] for sample in samples]
+        values = [sample[1] for sample in samples]
+        return signal_type, is_periodic, num_samples, indexes, values
+
+    @staticmethod
+    def read_signal_from_file(file_name):
+        signal = open(file_name)
         # define the signal
         signal_type = int(signal.readline().strip())
         is_periodic = int(signal.readline().strip())
@@ -136,10 +150,9 @@ class FourierTransform:
         for k in range(len(values)):
             harmonic = FourierTransform.calculate_harmonic_or_element(k, values, type_of_calc)
             if type_of_calc == 'idft':
-                output.append(int(harmonic.real))
+                output.append(harmonic.real.__round__(3))
             else:
                 output.append(harmonic)
-
         return output
 
     @staticmethod
@@ -158,7 +171,7 @@ class FourierTransform:
             return 0
         rtn = values[n] * FourierTransform.calculate_exp(n, k, len(values), type_of_calc)
         if type_of_calc == 'idft':
-            rtn = (rtn.real.__round__() + (rtn.imag.__round__() * 1j))
+            rtn = (rtn.real + (rtn.imag * 1j))
         return rtn
 
     @staticmethod
@@ -171,7 +184,6 @@ class FourierTransform:
         if type_of_calc == 'dft':
             sin_value *= -1j
         else:
-            cos_value = cos_value.__round__()
             sin_value *= 1j
         e = cos_value + sin_value
 
@@ -291,6 +303,63 @@ class DCTTransform:
             result = signal_values[i] - DCTTransform.calculate_mean_of_signal(signal_values)
             removed_values.append(round(result, 3))
         return removed_values
+
+
+class TaskSix:
+    @staticmethod
+    def derivative_signal():
+        return DerivativeSignal()
+
+    @staticmethod
+    def shifting_signal(signal, k, folding):
+        shifted_signal = []
+        for i in range(len(signal)):
+            if folding:
+                shifted_signal.append(signal[i] + k)
+            else:
+                shifted_signal.append(signal[i] - k)
+        return shifted_signal
+
+    @staticmethod
+    def folding_signal(signal):
+        signal.reverse()
+        return signal
+
+    @staticmethod
+    def smoothing_signal(signal, window_size):
+        smoothed_signal = []
+        for i in range(len(signal) - 1):
+            summ = 0
+            for j in range(i, window_size):
+                summ += signal[j]
+            smoothed_signal.append(summ / window_size)
+        return smoothed_signal
+
+    @staticmethod
+    def remove_dc(signal):
+        new_signal = FourierTransform.calculate_dft_and_idft(signal, 'dft')
+        new_signal[0] = 0
+        new_signal = FourierTransform.calculate_dft_and_idft(new_signal, 'idft')
+        return new_signal
+
+    @staticmethod
+    def convolve():
+        _, _, len_signal_1, indexes_1, signal_1 = SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig1.txt')
+        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig2.txt')
+        # Length of the output signal
+        len_output_signal = len_signal_1 + len_signal_2 - 1
+        output_signal = []
+        for i in range(len_output_signal):
+            output_signal.append(0)
+
+        for n in range(len_output_signal):
+            for k in range(max(0, n - len_signal_2 + 1), min(len_signal_1, n + 1)):
+                output_signal[n] += signal_1[k] * signal_2[n - k]
+
+        output_indexes = indexes_1 + indexes_2
+        x = list(set(output_indexes))
+        x.sort()
+        return x, output_signal
 
 
 class SignalType(Enum):
