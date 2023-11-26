@@ -666,7 +666,7 @@ class Task6:
 
     def calculate_smoothing(self):
         k = int(self.window_size.get())
-        x = signal_plot.TaskSix.smoothing_signal(self.signal_values, k)
+        signal_plot.TaskSix.smoothing_signal(self.signal_values, k)
 
     @staticmethod
     def calculate_sharpening():
@@ -675,8 +675,7 @@ class Task6:
 
     def calculate_shifting(self):
         steps = int(self.shifting_steps.get())
-        x = signal_plot.TaskSix.shifting_signal(self.indexes, steps, False)
-        self.signal_representation(x)
+        signal_plot.TaskSix.shifting_signal(self.indexes, steps, False)
 
     def folding_signal(self):
         x = signal_plot.TaskSix.folding_signal(self.signal_values)
