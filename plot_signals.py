@@ -1,7 +1,7 @@
 import math
 from decimal import Decimal, getcontext
 from tkinter import filedialog
-
+import os
 import matplotlib.pyplot as plt
 from enum import Enum
 import numpy as np
@@ -365,8 +365,9 @@ class TaskSix:
 class TaskSeven:
     @staticmethod
     def calculate_cross_correlation_element(signal1, signal2):
+
         summ = 0
-        n = len(signal1)
+        n = len(signal2)
         for i in range(n):
             summ += signal1[i] * signal2[i]
         return summ
@@ -388,8 +389,6 @@ class TaskSeven:
         down_term_first_element = TaskSeven.calculate_cross_correlation_element(signal1, signal1, )
         down_term_second_element = TaskSeven.calculate_cross_correlation_element(signal2, signal2)
         down_term = math.sqrt((down_term_first_element * down_term_second_element)) / len(signal1)
-        print(f'down term {down_term}')
-        # to here work wright
         corr = TaskSeven.calculate_cross_correlation(signal1, signal2)
         normalized_cross_correlation_signal = [x / down_term for x in corr]
         return normalized_cross_correlation_signal
@@ -397,13 +396,58 @@ class TaskSeven:
     @staticmethod
     def calculate_time_analysis(signal1, signal2, indicates, fs):
         calc_correlation = TaskSeven.calculate_cross_correlation(signal1, signal2)
-        abs_value = [abs(x * len(signal1)) for x in calc_correlation]
+        abs_value = [abs(x) for x in calc_correlation]
         max_value = max(abs_value)
         the_lag = indicates[abs_value.index(max_value)]
         ts = 1 / fs
         return the_lag * ts
 
+    @staticmethod
+    def get_signal_of_class(folder_path):
+        means_list = []
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
 
+            if os.path.isfile(file_path) and filename.endswith('.txt'):
+                # Read numbers from the text file
+                with open(file_path, 'r') as file:
+                    lines = file.readlines()
+
+                # Convert lines to integers
+                numbers = [int(line.strip()) for line in lines]
+
+                # Calculate mean and append to means_list
+                mean_value = sum(numbers) / len(numbers)
+                means_list.append(mean_value)
+        return means_list
+
+    @staticmethod
+    def get_correlation_of_test():
+        with open('test_signals/Test1.txt', 'r') as file:
+            lines1 = file.readlines()
+
+        with open('test_signals/Test2.txt', 'r') as file:
+            lines2 = file.readlines()
+
+        # test signal
+        signal_test_1 = [int(line.strip()) for line in lines1]
+        signal_test_2 = [int(line.strip()) for line in lines2]
+
+        # class signals
+        signal_class_1 = TaskSeven.get_signal_of_class('class_1_files')
+        signal_class_2 = TaskSeven.get_signal_of_class('class_2_files')
+        signal_class = signal_class_1 + signal_class_2
+
+        correlation1 = TaskSeven.calculate_cross_correlation(signal_test_1, signal_class)
+        correlation2 = TaskSeven.calculate_cross_correlation(signal_test_2, signal_class)
+
+        maxx = np.argmax(correlation1)
+        maxx1 = np.argmax(correlation2)
+
+        if maxx > maxx1:
+            return 'Test Signal 1 belongs to class 2 (UP)', 'Test Signal 2 belongs to class 1 (Down)'
+        else:
+            return 'Test Signal 2 belongs to class 2 (UP)', 'Test Signal 1 belongs to class 1 (Down)'
 
 
 class SignalType(Enum):
