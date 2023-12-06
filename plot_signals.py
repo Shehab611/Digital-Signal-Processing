@@ -377,7 +377,7 @@ class TaskSeven:
         cross = []
         tmp = signal2
         for i in range(len(signal2)):
-            value = TaskSeven.calculate_cross_correlation_element(signal1, tmp) / len(signal1)
+            value = TaskSeven.calculate_cross_correlation_element(signal1, tmp) / len(signal2)
             tmp_value = tmp[0]
             tmp = tmp[1:]
             tmp.append(tmp_value)
