@@ -457,8 +457,8 @@ class TaskSeven:
         correlation1 = TaskSeven.calculate_cross_correlation(signal_test_1, signal_class)
         correlation2 = TaskSeven.calculate_cross_correlation(signal_test_2, signal_class)
 
-        maxx = np.argmax(correlation1)
-        maxx1 = np.argmax(correlation2)
+        maxx = correlation1[0]
+        maxx1 = correlation2[0]
 
         if maxx > maxx1:
             return 'Test Signal 1 belongs to class 2 (UP)', 'Test Signal 2 belongs to class 1 (Down)'
