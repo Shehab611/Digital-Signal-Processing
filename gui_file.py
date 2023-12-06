@@ -3,7 +3,8 @@ from tkinter import ttk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
-from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, Shift_Fold_Signal, ConvTest
+from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, Shift_Fold_Signal, ConvTest, \
+    Compare_Signals
 import pandas as pd
 
 
@@ -749,6 +750,29 @@ class Task6:
         self.root.mainloop()
 
 
+class Task7:
+    def calculate_correlation(self):
+        correlation, indicates = signal_plot.TaskSeven.calculate_normalized_cross_correlation()
+        test_result = Compare_Signals('correalation_inputs,outputs/CorrOutput.txt', indicates, correlation)
+        messagebox.showinfo(title='Test Case Result', message=test_result)
+
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        self.task1_btn = tk.Button(self.button_frame, text='Correlation', command=self.calculate_correlation)
+        self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Time Analysis',)
+        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Template Matching', )
+        self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.button_frame.pack(fill='x', pady=10)
+        self.root.mainloop()
+
+
 class MainGui:
 
     def __init__(self):
@@ -770,6 +794,9 @@ class MainGui:
         def open_task_six():
             Task6()
 
+        def open_task_seven():
+            Task7()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -788,5 +815,7 @@ class MainGui:
         self.task1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 6', command=open_task_six)
         self.task1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 7', command=open_task_seven)
+        self.task1_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

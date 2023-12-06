@@ -34,6 +34,45 @@ def signal_samples_are_equal(file_name, samples):
     return "Test case passed successfully"
 
 
+def Compare_Signals(file_name, Your_indices, Your_samples):
+    expected_indices = []
+    expected_samples = []
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L = line.strip()
+            if len(L.split(' ')) == 2:
+                L = line.split(' ')
+                V1 = int(L[0])
+                V2 = float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
+            else:
+                break
+    print("Current Output Test file is: ")
+    print(file_name)
+    print("\n")
+    if (len(expected_samples) != len(Your_samples)) and (len(expected_indices) != len(Your_indices)):
+        return ("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
+
+    for i in range(len(Your_indices)):
+        if (Your_indices[i] != expected_indices[i]):
+            return ("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one")
+            return
+    for i in range(len(expected_samples)):
+        if abs(Your_samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            return ("Correlation Test case failed, your signal have different values from the expected one")
+            return
+    return ("Correlation Test case passed successfully")
+
+
 def QuantizationTest1(file_name, Your_EncodedValues, Your_QuantizedValues):
     expectedEncodedValues = []
     expectedQuantizedValues = []
@@ -163,9 +202,10 @@ def SignalComaprePhaseShift(SignalInput=[], SignalOutput=[]):
                 return False
         return True
 
-def Shift_Fold_Signal(file_name,Your_indices,Your_samples):
-    expected_indices=[]
-    expected_samples=[]
+
+def Shift_Fold_Signal(file_name, Your_indices, Your_samples):
+    expected_indices = []
+    expected_samples = []
     with open(file_name, 'r') as f:
         line = f.readline()
         line = f.readline()
@@ -173,11 +213,11 @@ def Shift_Fold_Signal(file_name,Your_indices,Your_samples):
         line = f.readline()
         while line:
             # process line
-            L=line.strip()
-            if len(L.split(' '))==2:
-                L=line.split(' ')
-                V1=int(L[0])
-                V2=float(L[1])
+            L = line.strip()
+            if len(L.split(' ')) == 2:
+                L = line.split(' ')
+                V1 = int(L[0])
+                V2 = float(L[1])
                 expected_indices.append(V1)
                 expected_samples.append(V2)
                 line = f.readline()
@@ -186,24 +226,24 @@ def Shift_Fold_Signal(file_name,Your_indices,Your_samples):
     print("Current Output Test file is: ")
     print(file_name)
     print("\n")
-    if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
+    if (len(expected_samples) != len(Your_samples)) and (len(expected_indices) != len(Your_indices)):
         print("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
-        return("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
+        return ("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
 
     for i in range(len(Your_indices)):
-        if(Your_indices[i]!=expected_indices[i]):
+        if (Your_indices[i] != expected_indices[i]):
             print("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one")
-            return("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one")
+            return ("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one")
 
     for i in range(len(expected_samples)):
         if abs(Your_samples[i] - expected_samples[i]) < 0.01:
             continue
         else:
             print("Shift_Fold_Signal Test case failed, your signal have different values from the expected one")
-            return("Shift_Fold_Signal Test case failed, your signal have different values from the expected one")
+            return ("Shift_Fold_Signal Test case failed, your signal have different values from the expected one")
 
     print("Shift_Fold_Signal Test case passed successfully")
-    return("Shift_Fold_Signal Test case passed successfully")
+    return ("Shift_Fold_Signal Test case passed successfully")
 
 
 def ConvTest(Your_indices, Your_samples):
@@ -220,16 +260,16 @@ def ConvTest(Your_indices, Your_samples):
     expected_samples = [1, 1, -1, 0, 0, 3, 3, 2, 1]
 
     if (len(expected_samples) != len(Your_samples)) and (len(expected_indices) != len(Your_indices)):
-        return("Conv Test case failed, your signal have different length from the expected one")
+        return ("Conv Test case failed, your signal have different length from the expected one")
 
     for i in range(len(Your_indices)):
         if (Your_indices[i] != expected_indices[i]):
-            return("Conv Test case failed, your signal have different indicies from the expected one")
+            return ("Conv Test case failed, your signal have different indicies from the expected one")
             return
     for i in range(len(expected_samples)):
         if abs(Your_samples[i] - expected_samples[i]) < 0.01:
             continue
         else:
-            return("Conv Test case failed, your signal have different values from the expected one")
+            return ("Conv Test case failed, your signal have different values from the expected one")
             return
-    return("Conv Test case passed successfully")
+    return ("Conv Test case passed successfully")

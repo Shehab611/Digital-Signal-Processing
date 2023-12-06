@@ -385,13 +385,27 @@ class TaskSeven:
         return cross
 
     @staticmethod
-    def calculate_normalized_cross_correlation(signal1, signal2):
+    def read_signal(file_path):
+        signal = open(file_path)
+        # define the signal
+        signal_type = int(signal.readline().strip())
+        is_periodic = int(signal.readline().strip())
+        num_samples = int(signal.readline().strip())
+        samples = [list(map(float, line.strip().split())) for line in signal]
+        indexes = [sample[0] for sample in samples]
+        values = [sample[1] for sample in samples]
+        return signal_type, is_periodic, num_samples, indexes, values
+
+    @staticmethod
+    def calculate_normalized_cross_correlation():
+        _, _, _, indicates, signal1 = TaskSeven.read_signal('correalation_inputs,outputs/Corr_input signal1.txt')
+        _, _, _, indicates, signal2 = TaskSeven.read_signal('correalation_inputs,outputs/Corr_input signal2.txt')
         down_term_first_element = TaskSeven.calculate_cross_correlation_element(signal1, signal1, )
         down_term_second_element = TaskSeven.calculate_cross_correlation_element(signal2, signal2)
         down_term = math.sqrt((down_term_first_element * down_term_second_element)) / len(signal1)
         corr = TaskSeven.calculate_cross_correlation(signal1, signal2)
         normalized_cross_correlation_signal = [x / down_term for x in corr]
-        return normalized_cross_correlation_signal
+        return normalized_cross_correlation_signal, indicates
 
     @staticmethod
     def calculate_time_analysis(signal1, signal2, indicates, fs):
