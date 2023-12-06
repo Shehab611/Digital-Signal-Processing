@@ -756,6 +756,15 @@ class Task7:
         test_result = Compare_Signals('correalation_inputs,outputs/CorrOutput.txt', indicates, correlation)
         messagebox.showinfo(title='Test Case Result', message=test_result)
 
+    def time_analysis(self):
+        value = signal_plot.TaskSeven.calculate_time_analysis(100)
+        messagebox.showinfo(title='Time Analysis value', message=value)
+
+    def template_matching(self):
+        value = signal_plot.TaskSeven.get_correlation_of_test()
+        new_value = f'{value[0]} \n {value[1]}'
+        messagebox.showinfo(title='Template Matching', message=new_value)
+
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Choose Task')
@@ -765,9 +774,9 @@ class Task7:
         self.button_frame.columnconfigure(1, weight=1)
         self.task1_btn = tk.Button(self.button_frame, text='Correlation', command=self.calculate_correlation)
         self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
-        self.task1_btn = tk.Button(self.button_frame, text='Time Analysis',)
+        self.task1_btn = tk.Button(self.button_frame, text='Time Analysis', command=self.time_analysis)
         self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
-        self.task1_btn = tk.Button(self.button_frame, text='Template Matching', )
+        self.task1_btn = tk.Button(self.button_frame, text='Template Matching', command=self.template_matching)
         self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

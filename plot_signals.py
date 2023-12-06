@@ -408,7 +408,9 @@ class TaskSeven:
         return normalized_cross_correlation_signal, indicates
 
     @staticmethod
-    def calculate_time_analysis(signal1, signal2, indicates, fs):
+    def calculate_time_analysis(fs):
+        _, _, _, indicates, signal1 = TaskSeven.read_signal('time_analysis_files/TD_input signal1.txt')
+        _, _, _, indicates, signal2 = TaskSeven.read_signal('time_analysis_files/TD_input signal2.txt')
         calc_correlation = TaskSeven.calculate_cross_correlation(signal1, signal2)
         abs_value = [abs(x) for x in calc_correlation]
         max_value = max(abs_value)
