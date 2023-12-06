@@ -362,6 +362,50 @@ class TaskSix:
         return x, output_signal
 
 
+class TaskSeven:
+    @staticmethod
+    def calculate_cross_correlation_element(signal1, signal2):
+        summ = 0
+        n = len(signal1)
+        for i in range(n):
+            summ += signal1[i] * signal2[i]
+        return summ
+
+    @staticmethod
+    def calculate_cross_correlation(signal1, signal2):
+        cross = []
+        tmp = signal2
+        for i in range(len(signal2)):
+            value = TaskSeven.calculate_cross_correlation_element(signal1, tmp) / len(signal1)
+            tmp_value = tmp[0]
+            tmp = tmp[1:]
+            tmp.append(tmp_value)
+            cross.append(value)
+        return cross
+
+    @staticmethod
+    def calculate_normalized_cross_correlation(signal1, signal2):
+        down_term_first_element = TaskSeven.calculate_cross_correlation_element(signal1, signal1, )
+        down_term_second_element = TaskSeven.calculate_cross_correlation_element(signal2, signal2)
+        down_term = math.sqrt((down_term_first_element * down_term_second_element)) / len(signal1)
+        print(f'down term {down_term}')
+        # to here work wright
+        corr = TaskSeven.calculate_cross_correlation(signal1, signal2)
+        normalized_cross_correlation_signal = [x / down_term for x in corr]
+        return normalized_cross_correlation_signal
+
+    @staticmethod
+    def calculate_time_analysis(signal1, signal2, indicates, fs):
+        calc_correlation = TaskSeven.calculate_cross_correlation(signal1, signal2)
+        abs_value = [abs(x * len(signal1)) for x in calc_correlation]
+        max_value = max(abs_value)
+        the_lag = indicates[abs_value.index(max_value)]
+        ts = 1 / fs
+        return the_lag * ts
+
+
+
+
 class SignalType(Enum):
     Continuous = 1
     Discrete = 2
