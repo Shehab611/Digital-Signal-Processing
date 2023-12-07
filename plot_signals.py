@@ -365,41 +365,29 @@ class TaskSix:
 class TaskSeven:
     @staticmethod
     def calculate_cross_correlation_element(signal1, signal2):
-
         summ = 0
-        n = len(signal2)
-        for i in range(n):
+        for i in range(len(signal2)):
             summ += signal1[i] * signal2[i]
         return summ
 
     @staticmethod
+    def shift_signal(signal):
+        tmp_value = signal[0]
+        signal = signal[1:]
+        signal.append(tmp_value)
+        return signal
+
+    @staticmethod
     def calculate_cross_correlation(signal1, signal2):
-        cross = []
-        tmp = signal2
+        correlation = []
         for i in range(len(signal2)):
-            value = TaskSeven.calculate_cross_correlation_element(signal1, tmp) / len(signal2)
-            tmp_value = tmp[0]
-            tmp = tmp[1:]
-            tmp.append(tmp_value)
-            cross.append(value)
-        return cross
+            value = TaskSeven.calculate_cross_correlation_element(signal1, signal2) / len(signal2)
+            signal2 = TaskSeven.shift_signal(signal2)
+            correlation.append(value)
+        return correlation
 
     @staticmethod
-    def read_signal(file_path):
-        signal = open(file_path)
-        # define the signal
-        signal_type = int(signal.readline().strip())
-        is_periodic = int(signal.readline().strip())
-        num_samples = int(signal.readline().strip())
-        samples = [list(map(float, line.strip().split())) for line in signal]
-        indexes = [sample[0] for sample in samples]
-        values = [sample[1] for sample in samples]
-        return signal_type, is_periodic, num_samples, indexes, values
-
-    @staticmethod
-    def calculate_normalized_cross_correlation():
-        _, _, _, indicates, signal1 = TaskSeven.read_signal('correalation_inputs,outputs/Corr_input signal1.txt')
-        _, _, _, indicates, signal2 = TaskSeven.read_signal('correalation_inputs,outputs/Corr_input signal2.txt')
+    def calculate_normalized_cross_correlation(signal1,signal2,indicates):
         down_term_first_element = TaskSeven.calculate_cross_correlation_element(signal1, signal1, )
         down_term_second_element = TaskSeven.calculate_cross_correlation_element(signal2, signal2)
         down_term = math.sqrt((down_term_first_element * down_term_second_element)) / len(signal1)
@@ -409,8 +397,8 @@ class TaskSeven:
 
     @staticmethod
     def calculate_time_analysis(fs):
-        _, _, _, indicates, signal1 = TaskSeven.read_signal('time_analysis_files/TD_input signal1.txt')
-        _, _, _, indicates, signal2 = TaskSeven.read_signal('time_analysis_files/TD_input signal2.txt')
+        _, _, _, indicates, signal1 = SignalsMethods.read_signal_from_file('time_analysis_files/TD_input signal1.txt')
+        _, _, _, indicates, signal2 = SignalsMethods.read_signal_from_file('time_analysis_files/TD_input signal2.txt')
         calc_correlation = TaskSeven.calculate_cross_correlation(signal1, signal2)
         abs_value = [abs(x) for x in calc_correlation]
         max_value = max(abs_value)
@@ -464,6 +452,26 @@ class TaskSeven:
             return 'Test Signal 1 belongs to class 2 (UP)', 'Test Signal 2 belongs to class 1 (Down)'
         else:
             return 'Test Signal 2 belongs to class 2 (UP)', 'Test Signal 1 belongs to class 1 (Down)'
+
+
+class TaskEight:
+    @staticmethod
+    def fast_correlation(signal1, signal2):
+        signal1 = FourierTransform.calculate_dft_and_idft(signal1, 'dft')
+        signal2 = FourierTransform.calculate_dft_and_idft(signal2, 'dft')
+        signal1 = [complex_num.conjugate() for complex_num in signal1]
+        result = [x * y for x, y in zip(signal1, signal2)]
+        result = FourierTransform.calculate_dft_and_idft(result, 'idft')
+        result = [x / len(signal1) for x in result]
+        return result
+
+    @staticmethod
+    def fast_convolution(signal1, signal2):
+        signal1 = FourierTransform.calculate_dft_and_idft(signal1, 'dft')
+        signal2 = FourierTransform.calculate_dft_and_idft(signal2, 'dft')
+        result = [x * y for x, y in zip(signal1, signal2)]
+        result = FourierTransform.calculate_dft_and_idft(result, 'idft')
+        return result
 
 
 class SignalType(Enum):

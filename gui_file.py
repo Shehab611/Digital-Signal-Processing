@@ -751,16 +751,24 @@ class Task6:
 
 
 class Task7:
-    def calculate_correlation(self):
-        correlation, indicates = signal_plot.TaskSeven.calculate_normalized_cross_correlation()
+    @staticmethod
+    def calculate_correlation():
+        _, _, _, indicates, signal1 = signal_plot.SignalsMethods.read_signal_from_file(
+            'correalation_inputs,outputs/Corr_input signal1.txt')
+        _, _, _, indicates, signal2 = signal_plot.SignalsMethods.read_signal_from_file(
+            'correalation_inputs,outputs/Corr_input signal2.txt')
+        correlation, indicates = signal_plot.TaskSeven.calculate_normalized_cross_correlation(signal1, signal2,
+                                                                                              indicates)
         test_result = Compare_Signals('correalation_inputs,outputs/CorrOutput.txt', indicates, correlation)
         messagebox.showinfo(title='Test Case Result', message=test_result)
 
-    def time_analysis(self):
+    @staticmethod
+    def time_analysis():
         value = signal_plot.TaskSeven.calculate_time_analysis(100)
         messagebox.showinfo(title='Time Analysis value', message=value)
 
-    def template_matching(self):
+    @staticmethod
+    def template_matching():
         value = signal_plot.TaskSeven.get_correlation_of_test()
         new_value = f'{value[0]} \n {value[1]}'
         messagebox.showinfo(title='Template Matching', message=new_value)
@@ -778,6 +786,36 @@ class Task7:
         self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
         self.task1_btn = tk.Button(self.button_frame, text='Template Matching', command=self.template_matching)
         self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.button_frame.pack(fill='x', pady=10)
+        self.root.mainloop()
+
+
+class Task8:
+    @staticmethod
+    def fast_correlation():
+        signal1 = [1, 0, 0, 1]
+        signal2 = [0.5, 1, 1, 0.5]
+        correlation = signal_plot.TaskEight.fast_correlation(signal1, signal2)
+        print(correlation)
+
+    @staticmethod
+    def fast_convolution():
+        signal1 = []
+        signal2 = []
+        convolution = signal_plot.TaskEight.fast_convolution(signal1, signal2)
+        print(convolution)
+
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        self.task1_btn = tk.Button(self.button_frame, text='Fast Correlation', command=self.fast_correlation)
+        self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Fast Convolution', command=self.fast_convolution)
+        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
 
@@ -806,6 +844,9 @@ class MainGui:
         def open_task_seven():
             Task7()
 
+        def open_task_eight():
+            Task8()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -826,5 +867,7 @@ class MainGui:
         self.task1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 7', command=open_task_seven)
         self.task1_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Task 8', command=open_task_eight)
+        self.task1_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
