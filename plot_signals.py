@@ -387,7 +387,7 @@ class TaskSeven:
         return correlation
 
     @staticmethod
-    def calculate_normalized_cross_correlation(signal1,signal2,indicates):
+    def calculate_normalized_cross_correlation(signal1, signal2, indicates):
         down_term_first_element = TaskSeven.calculate_cross_correlation_element(signal1, signal1, )
         down_term_second_element = TaskSeven.calculate_cross_correlation_element(signal2, signal2)
         down_term = math.sqrt((down_term_first_element * down_term_second_element)) / len(signal1)
@@ -472,6 +472,171 @@ class TaskEight:
         result = [x * y for x, y in zip(signal1, signal2)]
         result = FourierTransform.calculate_dft_and_idft(result, 'idft')
         return result
+
+
+class PracticalTaskOne:
+
+    @staticmethod
+    def next_odd_num(num=0.0):
+        if num.__ceil__() % 2 == 0:
+            return num.__ceil__() + 1
+        elif num.__ceil__() % 1 == 0:
+            return num.__ceil__()
+
+    @staticmethod
+    def read_filter_parameters(file_path):
+        parameters = {}
+        with open(file_path, 'r') as file:
+            for line in file:
+                key, value = line.strip().split(' = ')
+                parameters[key] = value
+        f2 = None
+        filter_type = parameters['FilterType']
+        fs = int(parameters['FS'])
+        stop_band = int(parameters['StopBandAttenuation'])
+        transition_band = int(parameters['TransitionBand'])
+        if filter_type.__contains__('Band'):
+            f1 = int(parameters['F1'])
+            f2 = int(parameters['F2'])
+        else:
+            f1 = int(parameters['FC'])
+        return filter_type, fs, stop_band, transition_band, f1, f2
+
+    @staticmethod
+    def determine_window_type(stop_band):
+        bands = [21, 44, 53, 74]
+        window_names = ['rectangular', 'hanning', 'hamming', 'blackman']
+        for i in range(len(bands)):
+            if bands[i] >= stop_band:
+                return window_names[i]
+
+    @staticmethod
+    def get_number_of_elements(type_of_window, fs, transition_band):
+        normalized_transition_band = transition_band / fs
+        if type_of_window == 'rectangular':
+            return PracticalTaskOne.next_odd_num(0.9 / normalized_transition_band)
+        elif type_of_window == 'hanning':
+            return PracticalTaskOne.next_odd_num(3.1 / normalized_transition_band)
+        elif type_of_window == 'hamming':
+            return PracticalTaskOne.next_odd_num(3.3 / normalized_transition_band)
+        return PracticalTaskOne.next_odd_num(5.5 / normalized_transition_band)
+
+    @staticmethod
+    def convolve(len_signal_1, indexes_1, signal_1, file_path):
+        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(file_path)
+        # Length of the output signal
+        len_output_signal = len_signal_1 + len_signal_2 - 1
+        output_signal = []
+        for i in range(len_output_signal):
+            output_signal.append(0)
+
+        for n in range(len_output_signal):
+            for k in range(max(0, n - len_signal_2 + 1), min(len_signal_1, n + 1)):
+                output_signal[n] += signal_1[k] * signal_2[n - k]
+
+        output_indexes = indexes_1 + indexes_2
+        x = list(set(output_indexes))
+        x.sort()
+        return x, output_signal
+
+    @staticmethod
+    def get_new_fc(f1, transition_band, filter_type, fs, f2=None):
+        if filter_type == 'Low pass':
+            return (f1 + (transition_band / 2)) / fs, None
+        elif filter_type == 'High pass':
+            return (f1 - (transition_band / 2)) / fs, None
+        elif filter_type == 'Band pass':
+            return (f1 - (transition_band / 2)) / fs, (f2 + (transition_band / 2)) / fs
+        else:
+            return (f1 + (transition_band / 2)) / fs, (f2 - (transition_band / 2)) / fs
+
+    @staticmethod
+    def calculate_window_items(window_type, total_elements, ):
+        windows_list = []
+        for element_index in range((total_elements / 2).__ceil__()):
+            if window_type == 'hanning':
+                windows_list.append(0.5 + (0.5 * math.cos((2 * math.pi * element_index) / total_elements)))
+            elif window_type == 'hamming':
+                windows_list.append(0.54 + (0.46 * math.cos((2 * math.pi * element_index) / total_elements)))
+            elif window_type == 'blackman':
+                first_element = 0.5 * math.cos((2 * math.pi * element_index) / (total_elements - 1))
+                second_element = 0.08 * math.cos((4 * math.pi * element_index) / (total_elements - 1))
+                windows_list.append(0.42 + second_element + first_element)
+        return windows_list
+
+    @staticmethod
+    def calculate_filter_items(filter_type, total_elements, new_fc):
+        f1 = new_fc[0]
+        f2 = new_fc[1]
+        filtered_list = []
+        for element_index in range((total_elements / 2).__ceil__()):
+            if filter_type == 'Low pass':
+                if element_index == 0:
+                    filtered_list.append(2 * f1)
+                else:
+                    x = element_index * 2 * math.pi * f1
+                    filtered_list.append(2 * f1 * (math.sin(x) / x))
+            elif filter_type == 'High pass':
+                if element_index == 0:
+                    filtered_list.append(1 - (2 * f1))
+                else:
+                    x = element_index * 2 * math.pi * f1
+                    filtered_list.append(-2 * f1 * (math.sin(x) / x))
+            elif filter_type == 'Band pass':
+                if element_index == 0:
+                    filtered_list.append(2 * round(f2 - f1, 2))
+                else:
+                    x1 = element_index * 2 * math.pi * f1
+                    x2 = element_index * 2 * math.pi * f2
+                    filtered_list.append((2 * f2 * (math.sin(x2) / x2)) - (2 * f1 * (math.sin(x1) / x1)))
+            else:
+                if element_index == 0:
+                    filtered_list.append(1 - (2 * (f2 - f1)))
+                else:
+                    x1 = element_index * 2 * math.pi * f1
+                    x2 = element_index * 2 * math.pi * f2
+                    filtered_list.append(((2 * f2 * (math.sin(x2) / x2)) - (2 * f1 * (math.sin(x1) / x1))) * -1)
+        return filtered_list
+
+    @staticmethod
+    def calculate_filter(file_path, ):
+        filter_type, fs, stop_band, transition_band, f1, f2 = PracticalTaskOne.read_filter_parameters(file_path)
+        window_type = PracticalTaskOne.determine_window_type(stop_band)
+        total_elements = PracticalTaskOne.get_number_of_elements(window_type, fs, transition_band)
+        new_fc = PracticalTaskOne.get_new_fc(f1, transition_band, filter_type, fs, f2)
+        indicates = PracticalTaskOne.fill_the_indicates(total_elements)
+        window_list = PracticalTaskOne.calculate_window_items(window_type, total_elements)
+        filtered_list = PracticalTaskOne.calculate_filter_items(filter_type, total_elements, new_fc)
+        filtered_list = PracticalTaskOne.fill_filtered_list(window_list, filtered_list)
+        print(filtered_list[(len(filtered_list) / 2).__floor__()])
+        return indicates, filtered_list
+
+    @staticmethod
+    def calculated_filtered_signal(filter_spec_path, signal_file_path):
+        indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
+        x, y = PracticalTaskOne.convolve(len(indicates), indicates, filtered_list, signal_file_path)
+        return x, y
+
+    @staticmethod
+    def fill_the_indicates(total_elements):
+        list_1 = []
+        list_2 = []
+        for i in range((total_elements / 2).__ceil__()):
+            list_1.append(i)
+            list_2.append(-i)
+        indicates = list_1 + list_2
+        indicates = list(set(indicates))
+        indicates.sort()
+        return indicates
+
+    @staticmethod
+    def fill_filtered_list(window_list, filtered_list):
+        list1 = [x * y for x, y in zip(window_list, filtered_list)]
+        list2 = [x * y for x, y in zip(window_list, filtered_list)]
+        list2.reverse()
+        list2.extend(list1)
+        list2.remove(list2[int(len(list2) / 2)])
+        return list2
 
 
 class SignalType(Enum):

@@ -4,7 +4,7 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
 from test_output import signal_samples_are_equal, QuantizationTest1, QuantizationTest2, Shift_Fold_Signal, ConvTest, \
-    Compare_Signals
+    Compare_Signals_fir
 import pandas as pd
 
 
@@ -759,7 +759,7 @@ class Task7:
             'correalation_inputs,outputs/Corr_input signal2.txt')
         correlation, indicates = signal_plot.TaskSeven.calculate_normalized_cross_correlation(signal1, signal2,
                                                                                               indicates)
-        test_result = Compare_Signals('correalation_inputs,outputs/CorrOutput.txt', indicates, correlation)
+        test_result = Compare_Signals_fir('correalation_inputs,outputs/CorrOutput.txt', indicates, correlation)
         messagebox.showinfo(title='Test Case Result', message=test_result)
 
     @staticmethod
