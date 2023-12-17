@@ -14,8 +14,10 @@ def open_file_dialog():
     file_path = filedialog.askopenfilename()
     return file_path
 
-
-t = PracticalTaskOne.calculated_filtered_signal(open_file_dialog(), open_file_dialog())
+print(-0.0009139992863517461 * -54.0)
+#0.04935596146299429
+t = PracticalTaskOne.calculated_filtered_signal(open_file_dialog(),open_file_dialog())
+# t = PracticalTaskOne.up_sampling(open_file_dialog(),open_file_dialog(),3)
 print(t[0])
 print(t[1])
 Compare_Signals_fir(open_file_dialog(), t[0], t[1])

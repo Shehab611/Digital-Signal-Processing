@@ -522,18 +522,23 @@ class PracticalTaskOne:
         return PracticalTaskOne.next_odd_num(5.5 / normalized_transition_band)
 
     @staticmethod
-    def convolve(len_signal_1, indexes_1, signal_1, file_path):
-        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(file_path)
+    def convolve_signals(indexes_1, signal_1, indexes_2, signal_2):
+        # Lengths of the input signals
+        len_signal_1 = len(signal_1)
+        len_signal_2 = len(signal_2)
+
         # Length of the output signal
         len_output_signal = len_signal_1 + len_signal_2 - 1
-        output_signal = []
-        for i in range(len_output_signal):
-            output_signal.append(0)
 
+        # Initialize the output signal
+        output_signal = [0] * len_output_signal
+
+        # Perform convolution
         for n in range(len_output_signal):
             for k in range(max(0, n - len_signal_2 + 1), min(len_signal_1, n + 1)):
                 output_signal[n] += signal_1[k] * signal_2[n - k]
 
+        # Combine the indexes for the output signal
         output_indexes = indexes_1 + indexes_2
         x = list(set(output_indexes))
         x.sort()
@@ -608,13 +613,13 @@ class PracticalTaskOne:
         window_list = PracticalTaskOne.calculate_window_items(window_type, total_elements)
         filtered_list = PracticalTaskOne.calculate_filter_items(filter_type, total_elements, new_fc)
         filtered_list = PracticalTaskOne.fill_filtered_list(window_list, filtered_list)
-        print(filtered_list[(len(filtered_list) / 2).__floor__()])
         return indicates, filtered_list
 
     @staticmethod
     def calculated_filtered_signal(filter_spec_path, signal_file_path):
         indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
-        x, y = PracticalTaskOne.convolve(len(indicates), indicates, filtered_list, signal_file_path)
+        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(signal_file_path)
+        x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2)
         return x, y
 
     @staticmethod
@@ -637,6 +642,37 @@ class PracticalTaskOne:
         list2.extend(list1)
         list2.remove(list2[int(len(list2) / 2)])
         return list2
+
+    @staticmethod
+    def down_sampling(filter_spec_path, signal_file_path, factor_m):
+        down_sampled_signal = []
+        down_sampled_signal_indicates = []
+        x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_file_path)
+        # down_sampled_signal = y[::factor_m]
+        for i in range(0, len(y), factor_m):
+            down_sampled_signal.append(y[i])
+        for i in range(len(down_sampled_signal)):
+            down_sampled_signal_indicates.append(x[i])
+        return down_sampled_signal_indicates, down_sampled_signal
+
+    @staticmethod
+    def up_sampling(filter_spec_path, signal_file_path, factor_l):
+        # up sample the signal
+        _, _, len_signal, indexes, signal = SignalsMethods.read_signal_from_file(signal_file_path)
+        up_sampled_signal = []
+        up_sampled_signal_indicates = []
+        for i in range(len_signal):
+            up_sampled_signal.append(signal[i])
+            for _ in range(factor_l - 1):
+                up_sampled_signal.append(0)
+        for i in range(len(up_sampled_signal)):
+            up_sampled_signal_indicates.append(i)
+        # calculate the filter
+        indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path) # h(n)
+        # aplay the filter to the up sampled signal
+        x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list,
+                                                 up_sampled_signal_indicates, up_sampled_signal)
+        return x, y
 
 
 class SignalType(Enum):
