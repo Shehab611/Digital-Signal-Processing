@@ -5,7 +5,7 @@ from tkinter import filedialog
 from scipy.signal import firwin, freqz
 from test_output import Compare_Signals_fir
 
-#gui.MainGui()
+gui.MainGui()
 
 
 def open_file_dialog():
@@ -20,8 +20,8 @@ def open_file_dialog():
 # # 0.04935596146299429
 #t = PracticalTaskOne.calculated_filtered_signal(open_file_dialog(),open_file_dialog())
 # t = PracticalTaskOne.calculate_filter(open_file_dialog())
-t = PracticalTaskOne.resampling(open_file_dialog(), open_file_dialog(), 0, 3)
+#t = PracticalTaskOne.resampling(open_file_dialog(), 0, 3)
 # print(len(t[0]))
 # print(len(t[1]))
-print(len(t[0]),len(t[1]))
-Compare_Signals_fir(open_file_dialog(), t[0], t[1])
+# print(len(t[0]),len(t[1]))
+# Compare_Signals_fir(open_file_dialog(), t[0], t[1])

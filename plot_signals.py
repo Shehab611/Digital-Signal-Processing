@@ -11,13 +11,13 @@ from DerivativeSignal import DerivativeSignal
 
 class SignalsMethods:
     @staticmethod
-    def save_file(data, file_name):
+    def save_file(indicates, values, file_name):
         with open(file_name, 'w') as file:
             file.write('0 \n')
             file.write('0 \n')
-            file.write(f'{len(data)}\n')
-            for i in range(len(data)):
-                file.write(f'{i} {data[i]}\n')
+            file.write(f'{len(indicates)}\n')
+            for i in range(len(indicates)):
+                file.write(f'{indicates[i]} {values[i]}\n')
 
     @staticmethod
     def plot_normal_signal(indexes, values, x_label, y_label, signal_type, signal_title):
@@ -529,8 +529,7 @@ class PracticalTaskOne:
         elif type_of_window == 'hamming':
             return PracticalTaskOne.next_odd_num(3.3 / normalized_transition_band)
         return PracticalTaskOne.next_odd_num(5.5 / normalized_transition_band)
-#hammoing
-    # 53
+
     @staticmethod
     def convolve_signals(ind1, val1, ind2, val2):
         min_ind = int(ind1[0] + ind2[0])
@@ -645,7 +644,8 @@ class PracticalTaskOne:
         return list2
 
     @staticmethod
-    def resampling(filter_spec_path, signal_path, factor_m, factor_l):
+    def resampling(signal_path, factor_m, factor_l):
+        filter_spec_path = 'filter_spec_path'
         filter_indicates, filter_list = PracticalTaskOne.calculate_filter(filter_spec_path)
         _, _, _, signal_indicates, signal_list = SignalsMethods.read_signal_from_file(signal_path)
 

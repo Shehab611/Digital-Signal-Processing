@@ -844,15 +844,32 @@ class PracticalTask1:
             self.file_path)
 
     def aplay_filter_to_signal(self):
-        x, y = signal_plot.PracticalTaskOne.calculate_filter(self.file_path)
-        self.filtered_signal_indicates, self.filtered_signal_values = signal_plot.PracticalTaskOne.convolve_signals(x,
-                                                                                                                    y,
-                                                                                                                    self.signal_inputs,
-                                                                                                                    self.signal_values)
+        self.x, self.y = signal_plot.PracticalTaskOne.calculate_filter(self.file_path)
+        self.filtered_signal_indicates, self.filtered_signal_values = signal_plot.PracticalTaskOne.convolve_signals(
+            self.x,
+            self.y,
+            self.signal_inputs,
+            self.signal_values)
 
     def plot_signal(self):
         self.signal_representation(self.filtered_signal_values)
 
+    def test_applied_filter(self):
+        file_path = filedialog.askopenfilename()
+        msg = Compare_Signals_fir(file_path, self.filtered_signal_indicates, self.filtered_signal_values)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def test_filter_type(self):
+        file_path = filedialog.askopenfilename()
+        msg = Compare_Signals_fir(file_path, self.x, self.y)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
+    def save_in_file(self):
+        signal_plot.SignalsMethods.save_file(self.filtered_signal_indicates, self.filtered_signal_values,
+                                             'coefficients.txt')
+
+    # show data in grid view
+    # make resampling in the ui
     def __init__(self):
         self.filtered_signal_indicates = None
         self.filtered_signal_values = None
@@ -860,6 +877,8 @@ class PracticalTask1:
         self.signal_values = None
         self.filter_type = None
         self.fs = None
+        self.x = None
+        self.y = None
         self.stop_band = None
         self.transition_band = None
         self.file_path = None
@@ -871,15 +890,20 @@ class PracticalTask1:
         self.button_frame = tk.Frame(self.root)
         self.button_frame.columnconfigure(0, weight=1)
         self.button_frame.columnconfigure(1, weight=1)
-        self.task1_btn = tk.Button(self.button_frame, text='choose signal', command=self.choose_signal)
-        self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
-        self.task1_btn = tk.Button(self.button_frame, text='choose filter', command=self.choose_filter)
-        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
-        self.task1_btn = tk.Button(self.button_frame, text='apply filter', command=self.aplay_filter_to_signal)
-        self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Choose signal', command=self.choose_signal)
+        self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Choose filter', command=self.choose_filter)
+        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Apply filter', command=self.aplay_filter_to_signal)
+        self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Plot Signal', command=self.plot_signal)
-        self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
-
+        self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Test Applied Filter', command=self.test_applied_filter)
+        self.task1_btn.grid(row=2, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Test Filter Type', command=self.test_filter_type)
+        self.task1_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Save The Coefficients', command=self.save_in_file)
+        self.task1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=15)
         self.root.mainloop()
 
