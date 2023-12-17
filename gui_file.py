@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import plot_signals as signal_plot
@@ -786,7 +786,7 @@ class Task7:
         self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
         self.task1_btn = tk.Button(self.button_frame, text='Template Matching', command=self.template_matching)
         self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
-        self.button_frame.pack(fill='x', pady=10)
+        self.button_frame.pack(fill='x', pady=15)
         self.root.mainloop()
 
 
@@ -820,6 +820,70 @@ class Task8:
         self.root.mainloop()
 
 
+class PracticalTask1:
+    def signal_representation(self, y):
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.signal_inputs, self.signal_values, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal Before Filtering')
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(self.filtered_signal_indicates, y, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal After Filtering')
+        plt.tight_layout()
+        plt.show()
+
+    def choose_signal(self):
+        _, _, _, self.signal_inputs, self.signal_values = signal_plot.SignalsMethods.read_signal()
+
+    def choose_filter(self):
+        self.file_path = filedialog.askopenfilename()
+        self.filter_type, self.fs, self.stop_band, self.transition_band, self.f1, self.f2 = signal_plot.PracticalTaskOne.read_filter_parameters(
+            self.file_path)
+
+    def aplay_filter_to_signal(self):
+        x, y = signal_plot.PracticalTaskOne.calculate_filter(self.file_path)
+        self.filtered_signal_indicates, self.filtered_signal_values = signal_plot.PracticalTaskOne.convolve_signals(x,
+                                                                                                                    y,
+                                                                                                                    self.signal_inputs,
+                                                                                                                    self.signal_values)
+
+    def plot_signal(self):
+        self.signal_representation(self.filtered_signal_values)
+
+    def __init__(self):
+        self.filtered_signal_indicates = None
+        self.filtered_signal_values = None
+        self.signal_inputs = None
+        self.signal_values = None
+        self.filter_type = None
+        self.fs = None
+        self.stop_band = None
+        self.transition_band = None
+        self.file_path = None
+        self.f1 = None
+        self.f2 = None
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        self.task1_btn = tk.Button(self.button_frame, text='choose signal', command=self.choose_signal)
+        self.task1_btn.grid(row=0, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='choose filter', command=self.choose_filter)
+        self.task1_btn.grid(row=0, column=1, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='apply filter', command=self.aplay_filter_to_signal)
+        self.task1_btn.grid(row=1, column=0, sticky=tk.W + tk.E, padx=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Plot Signal', command=self.plot_signal)
+        self.task1_btn.grid(row=1, column=1, sticky=tk.W + tk.E, padx=10)
+
+        self.button_frame.pack(fill='x', pady=15)
+        self.root.mainloop()
+
+
 class MainGui:
 
     def __init__(self):
@@ -847,6 +911,9 @@ class MainGui:
         def open_task_eight():
             Task8()
 
+        def open_practical_task_one():
+            PracticalTask1()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -869,5 +936,9 @@ class MainGui:
         self.task1_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Task 8', command=open_task_eight)
         self.task1_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Practical Task One', command=open_practical_task_one)
+        self.task1_btn.grid(row=5, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Practical Task Two')
+        self.task1_btn.grid(row=5, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()

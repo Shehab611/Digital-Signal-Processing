@@ -11,6 +11,15 @@ from DerivativeSignal import DerivativeSignal
 
 class SignalsMethods:
     @staticmethod
+    def save_file(data, file_name):
+        with open(file_name, 'w') as file:
+            file.write('0 \n')
+            file.write('0 \n')
+            file.write(f'{len(data)}\n')
+            for i in range(len(data)):
+                file.write(f'{i} {data[i]}\n')
+
+    @staticmethod
     def plot_normal_signal(indexes, values, x_label, y_label, signal_type, signal_title):
         plt.title(signal_title)
         if signal_type == SignalType.Continuous:
@@ -520,29 +529,22 @@ class PracticalTaskOne:
         elif type_of_window == 'hamming':
             return PracticalTaskOne.next_odd_num(3.3 / normalized_transition_band)
         return PracticalTaskOne.next_odd_num(5.5 / normalized_transition_band)
-
+#hammoing
+    # 53
     @staticmethod
-    def convolve_signals(indexes_1, signal_1, indexes_2, signal_2):
-        # Lengths of the input signals
-        len_signal_1 = len(signal_1)
-        len_signal_2 = len(signal_2)
+    def convolve_signals(ind1, val1, ind2, val2):
+        min_ind = int(ind1[0] + ind2[0])
+        max_ind = int(ind1[-1] + ind2[-1])
+        result_length = max_ind - min_ind + 1
 
-        # Length of the output signal
-        len_output_signal = len_signal_1 + len_signal_2 - 1
+        result = [0] * result_length
+        indices = [i for i in range(min_ind, max_ind + 1)]
 
-        # Initialize the output signal
-        output_signal = [0] * len_output_signal
-
-        # Perform convolution
-        for n in range(len_output_signal):
-            for k in range(max(0, n - len_signal_2 + 1), min(len_signal_1, n + 1)):
-                output_signal[n] += signal_1[k] * signal_2[n - k]
-
-        # Combine the indexes for the output signal
-        output_indexes = indexes_1 + indexes_2
-        x = list(set(output_indexes))
-        x.sort()
-        return x, output_signal
+        for i in range(len(ind1)):
+            for j in range(len(ind2)):
+                index = int(ind1[i] + ind2[j])
+                result[index - min_ind] += val1[i] * val2[j]
+        return indices, result
 
     @staticmethod
     def get_new_fc(f1, transition_band, filter_type, fs, f2=None):
@@ -619,9 +621,7 @@ class PracticalTaskOne:
     def calculated_filtered_signal(filter_spec_path, signal_file_path):
         indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
         _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(signal_file_path)
-
-        x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2)
-        return x, y
+        return PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2, )
 
     @staticmethod
     def fill_the_indicates(total_elements):
@@ -645,39 +645,61 @@ class PracticalTaskOne:
         return list2
 
     @staticmethod
-    def down_sampling(filter_spec_path, signal_file_path, factor_m):
-        down_sampled_signal = []
-        down_sampled_signal_indicates = []
-        x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_file_path)
-        # down_sampled_signal = y[::factor_m]
-        for i in range(0, len(y), factor_m):
-            down_sampled_signal.append(y[i])
-        for i in range(len(down_sampled_signal)):
-            down_sampled_signal_indicates.append(x[i])
-        return down_sampled_signal_indicates, down_sampled_signal
+    def resampling(filter_spec_path, signal_path, factor_m, factor_l):
+        filter_indicates, filter_list = PracticalTaskOne.calculate_filter(filter_spec_path)
+        _, _, _, signal_indicates, signal_list = SignalsMethods.read_signal_from_file(signal_path)
+
+        if factor_m == 0 and factor_l != 0:
+            signal_indicates, signal_list = PracticalTaskOne.sampling_up(signal_indicates, signal_list, factor_l)
+            m, n = PracticalTaskOne.convolve_signals(filter_indicates, filter_list, signal_indicates, signal_list, )
+
+            for i in range(2):
+                n.remove(n[-1])
+                m.remove(m[-1])
+
+            return m, n
+
+        elif factor_l == 0 and factor_m != 0:
+            x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_path)
+            return PracticalTaskOne.sampling_down(x, y, factor_m)
+
+        elif factor_l != 0 and factor_m != 0:
+            t, p = PracticalTaskOne.sampling_up(signal_indicates, signal_list, factor_l)
+            x, y = PracticalTaskOne.convolve_signals(filter_indicates, filter_list, t, p, )
+            m, n = PracticalTaskOne.sampling_down(x, y, factor_m)
+
+            n.remove(n[-1])
+            m.remove(m[-1])
+            return m, n
+        return None, None
 
     @staticmethod
-    def up_sampling(filter_spec_path, signal_file_path, factor_l):
-        # up sample the signal
-        _, _, len_signal, indexes, signal = SignalsMethods.read_signal_from_file(signal_file_path)
+    def sampling_up(indicates, signal, factor_l):
         up_sampled_signal = []
         up_sampled_signal_indicates = []
-        for i in range(len_signal):
+
+        for i in range(len(indicates)):
             up_sampled_signal.append(signal[i])
             for _ in range(factor_l - 1):
                 up_sampled_signal.append(0)
+
         for i in range(len(up_sampled_signal)):
             up_sampled_signal_indicates.append(i)
-        # calculate the filter
-        indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path) # h(n)
 
-        # aplay the filter to the up sampled signal
+        return up_sampled_signal_indicates, up_sampled_signal
 
-        x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list,
-                                                 up_sampled_signal_indicates, up_sampled_signal)
-        print(len(y))
-        print(len(x))
-        return x, y
+    @staticmethod
+    def sampling_down(indicates, signal, factor_m):
+        down_sampled_signal = []
+        down_sampled_signal_indicates = []
+
+        for i in range(0, len(signal), factor_m):
+            down_sampled_signal.append(signal[i])
+
+        for i in range(len(down_sampled_signal)):
+            down_sampled_signal_indicates.append(indicates[i])
+
+        return down_sampled_signal_indicates, down_sampled_signal
 
 
 class SignalType(Enum):
