@@ -619,6 +619,7 @@ class PracticalTaskOne:
     def calculated_filtered_signal(filter_spec_path, signal_file_path):
         indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
         _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(signal_file_path)
+
         x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2)
         return x, y
 
@@ -669,9 +670,13 @@ class PracticalTaskOne:
             up_sampled_signal_indicates.append(i)
         # calculate the filter
         indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path) # h(n)
+
         # aplay the filter to the up sampled signal
+
         x, y = PracticalTaskOne.convolve_signals(indicates, filtered_list,
                                                  up_sampled_signal_indicates, up_sampled_signal)
+        print(len(y))
+        print(len(x))
         return x, y
 
 
