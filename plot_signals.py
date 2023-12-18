@@ -75,6 +75,17 @@ class SignalsMethods:
         return signal_type, is_periodic, num_samples, indexes, values
 
     @staticmethod
+    def read_signal_from_file_without_indicates(file_name):
+        signal = open(file_name)
+        # define the signal
+        signal_type = float(signal.readline().strip())
+        is_periodic = float(signal.readline().strip())
+        num_samples = float(signal.readline().strip())
+        samples = [list(map(float, line.strip().split())) for line in signal]
+        values = [sample[0] for sample in samples]
+        return signal_type, is_periodic, num_samples, values
+
+    @staticmethod
     def arithmetic_operations_on_signal(operation, y1_values=None, y2_values=None, multiplier=None, normalize=None):
         if operation == ArithmeticSignalOperations.Addition:
             signal_output = [x + y for x, y in zip(y1_values, y2_values)]
@@ -617,9 +628,8 @@ class PracticalTaskOne:
         return indicates, filtered_list
 
     @staticmethod
-    def calculated_filtered_signal(filter_spec_path, signal_file_path):
+    def calculated_filtered_signal(filter_spec_path, indexes_2, signal_2):
         indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
-        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file(signal_file_path)
         return PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2, )
 
     @staticmethod
@@ -644,10 +654,9 @@ class PracticalTaskOne:
         return list2
 
     @staticmethod
-    def resampling(signal_path, factor_m, factor_l):
-        filter_spec_path = 'filter_spec_path'
+    def resampling(signal_indicates, signal_list, factor_m, factor_l):
+        filter_spec_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 1/Sampling test cases/Testcase 1/Filter Specifications.txt'
         filter_indicates, filter_list = PracticalTaskOne.calculate_filter(filter_spec_path)
-        _, _, _, signal_indicates, signal_list = SignalsMethods.read_signal_from_file(signal_path)
 
         if factor_m == 0 and factor_l != 0:
             signal_indicates, signal_list = PracticalTaskOne.sampling_up(signal_indicates, signal_list, factor_l)
@@ -660,7 +669,7 @@ class PracticalTaskOne:
             return m, n
 
         elif factor_l == 0 and factor_m != 0:
-            x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_path)
+            x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_indicates, signal_list)
             return PracticalTaskOne.sampling_down(x, y, factor_m)
 
         elif factor_l != 0 and factor_m != 0:
@@ -677,10 +686,9 @@ class PracticalTaskOne:
     def sampling_up(indicates, signal, factor_l):
         up_sampled_signal = []
         up_sampled_signal_indicates = []
-
         for i in range(len(indicates)):
             up_sampled_signal.append(signal[i])
-            for _ in range(factor_l - 1):
+            for _ in range(int(factor_l) - 1):
                 up_sampled_signal.append(0)
 
         for i in range(len(up_sampled_signal)):
@@ -700,6 +708,101 @@ class PracticalTaskOne:
             down_sampled_signal_indicates.append(indicates[i])
 
         return down_sampled_signal_indicates, down_sampled_signal
+
+
+class PracticalTaskTwo:
+    folder_one_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 2/A'
+    folder_two_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 2/B'
+    folder_test_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 2/Test Folder'
+
+    @staticmethod
+    def appply_filter(minF, maxF, fs, signal):
+        signal_indicates = [i for i in range(len(signal))]
+        stop_band = 50
+        transition_band = 500
+        f1 = minF
+        f2 = maxF
+        if minF > 0 and maxF < fs / 2:
+            filter_type = 'Band pass'
+        else:
+            filter_type = 'Band Stop'
+
+        window_type = PracticalTaskOne.determine_window_type(stop_band)
+        total_elements = PracticalTaskOne.get_number_of_elements(window_type, fs, transition_band)
+        new_fc = PracticalTaskOne.get_new_fc(f1, transition_band, filter_type, fs, f2)
+        indicates = PracticalTaskOne.fill_the_indicates(total_elements)
+        window_list = PracticalTaskOne.calculate_window_items(window_type, total_elements)
+        filtered_list = PracticalTaskOne.calculate_filter_items(filter_type, total_elements, new_fc)
+        filtered_list = PracticalTaskOne.fill_filtered_list(window_list, filtered_list)
+        return PracticalTaskOne.convolve_signals(indicates, filtered_list, signal_indicates, signal, )
+
+    @staticmethod
+    def resampling_the_signal(newFs, maxF, Fs, signal_indicates, signal_list):
+        if newFs >= 2 * maxF:
+            # up sampling
+            if newFs > Fs:
+                return PracticalTaskOne.resampling(signal_indicates, signal_list, 0, (newFs / Fs))
+            # down sampling
+            elif newFs < Fs:
+                return PracticalTaskOne.resampling(signal_indicates, signal_list, 0, (Fs / newFs))
+            return signal_indicates, signal_list
+        return None, None
+
+    @staticmethod
+    def remove_dc_component(signal):
+        return TaskSix.remove_dc(signal)
+
+    @staticmethod
+    def normalize_signal(signal):
+        return SignalsMethods.arithmetic_operations_on_signal(
+            operation=ArithmeticSignalOperations.Normalization,
+            y1_values=signal, normalize='-1')
+
+    @staticmethod
+    def auto_corr(signal):
+        return TaskSeven.calculate_cross_correlation(signal, signal)
+
+    @staticmethod
+    def find_peaks(signal):
+        peaks = []
+        for i in range(1, len(signal) - 1):
+            if signal[i] > signal[i - 1] and signal[i] > signal[i + 1]:
+                peaks.append(i)
+        return peaks
+
+    @staticmethod
+    def compute_preserve_coff(signal):
+        signal = PracticalTaskTwo.auto_corr(signal)
+        signal = signal[len(signal) // 2:]
+        peaks = PracticalTaskTwo.find_peaks(signal)
+        return peaks
+
+    @staticmethod
+    def get_dct(signal):
+        return DCTTransform.dct_transform(signal)
+
+    @staticmethod
+    def calculate_file_dct(file_path, minF, maxF, fs, newFs):
+        _, _, _, signal = SignalsMethods.read_signal_from_file_without_indicates(file_path)
+        signal_indicates = [i for i in range(len(signal))]
+        _, signal = PracticalTaskTwo.appply_filter(minF, maxF, fs, signal)
+
+        c, v = PracticalTaskTwo.resampling_the_signal(newFs, maxF, fs, signal_indicates, signal)
+        if v is not None:
+            signal = v
+        signal = PracticalTaskTwo.normalize_signal(signal)
+        signal = PracticalTaskTwo.compute_preserve_coff(signal)
+        return PracticalTaskTwo.get_dct(signal)
+
+    @staticmethod
+    def calculate_average_files(folder_path, minF, maxF, fs, newFs):
+        dcts = []
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            if os.path.isfile(file_path) and filename.endswith('.txt'):
+                x = PracticalTaskTwo.calculate_file_dct(file_path, minF, maxF, fs, newFs)
+                dcts.append(sum(x) / len(x))
+        return dcts
 
 
 class SignalType(Enum):
