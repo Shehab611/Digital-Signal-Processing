@@ -288,6 +288,7 @@ class DCTTransform:
     @staticmethod
     def calculate_one_element(signal_values, n, k):
         angle = DCTTransform.calculate_angle(len(signal_values), n, k)
+
         return signal_values[n] * angle
 
     @staticmethod
@@ -363,23 +364,18 @@ class TaskSix:
         return new_signal
 
     @staticmethod
-    def convolve():
-        _, _, len_signal_1, indexes_1, signal_1 = SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig1.txt')
-        _, _, len_signal_2, indexes_2, signal_2 = SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig2.txt')
+    def convolve(indexes_1, signal_1, indexes_2, signal_2):
         # Length of the output signal
-        len_output_signal = len_signal_1 + len_signal_2 - 1
-        output_signal = []
-        for i in range(len_output_signal):
-            output_signal.append(0)
-
-        for n in range(len_output_signal):
-            for k in range(max(0, n - len_signal_2 + 1), min(len_signal_1, n + 1)):
-                output_signal[n] += signal_1[k] * signal_2[n - k]
-
-        output_indexes = indexes_1 + indexes_2
-        x = list(set(output_indexes))
-        x.sort()
-        return x, output_signal
+        min_ind = int(indexes_1[0] + indexes_2[0])
+        max_ind = int(indexes_1[-1] + indexes_2[-1])
+        result_length = max_ind - min_ind + 1
+        result = [0] * result_length
+        indices = [i for i in range(min_ind, max_ind + 1)]
+        for i in range(len(indexes_1)):
+            for j in range(len(indexes_2)):
+                index = int(indexes_1[i] + indexes_2[j])
+                result[index - min_ind] += signal_1[i] * signal_2[j]
+        return indices, result
 
 
 class TaskSeven:
@@ -497,14 +493,15 @@ class TaskEight:
 class PracticalTaskOne:
 
     @staticmethod
-    def next_odd_num(num=0.0):
-        if num.__ceil__() % 2 == 0:
-            return num.__ceil__() + 1
-        elif num.__ceil__() % 1 == 0:
-            return num.__ceil__()
+    def get_the_next_odd_number(num=0.0):
+        ceil_num = num.__ceil__()
+        if ceil_num % 2 == 0:
+            return ceil_num + 1
+        elif ceil_num % 1 == 0:
+            return ceil_num
 
     @staticmethod
-    def read_filter_parameters(file_path):
+    def read_filter_specifications(file_path):
         parameters = {}
         with open(file_path, 'r') as file:
             for line in file:
@@ -523,52 +520,41 @@ class PracticalTaskOne:
         return filter_type, fs, stop_band, transition_band, f1, f2
 
     @staticmethod
-    def determine_window_type(stop_band):
-        bands = [21, 44, 53, 74]
-        window_names = ['rectangular', 'hanning', 'hamming', 'blackman']
-        for i in range(len(bands)):
-            if bands[i] >= stop_band:
-                return window_names[i]
+    def get_window_type(stop_band):
+        bands_to_windows = {
+            21: 'rectangular',
+            44: 'hanning',
+            53: 'hamming',
+            74: 'blackman'
+        }
+        for band, window_name in sorted(bands_to_windows.items()):
+            if band >= stop_band:
+                return window_name
 
     @staticmethod
-    def get_number_of_elements(type_of_window, fs, transition_band):
+    def calculate_total_elements(type_of_window, fs, transition_band):
         normalized_transition_band = transition_band / fs
         if type_of_window == 'rectangular':
-            return PracticalTaskOne.next_odd_num(0.9 / normalized_transition_band)
+            return PracticalTaskOne.get_the_next_odd_number(0.9 / normalized_transition_band)
         elif type_of_window == 'hanning':
-            return PracticalTaskOne.next_odd_num(3.1 / normalized_transition_band)
+            return PracticalTaskOne.get_the_next_odd_number(3.1 / normalized_transition_band)
         elif type_of_window == 'hamming':
-            return PracticalTaskOne.next_odd_num(3.3 / normalized_transition_band)
-        return PracticalTaskOne.next_odd_num(5.5 / normalized_transition_band)
+            return PracticalTaskOne.get_the_next_odd_number(3.3 / normalized_transition_band)
+        return PracticalTaskOne.get_the_next_odd_number(5.5 / normalized_transition_band)
 
     @staticmethod
-    def convolve_signals(ind1, val1, ind2, val2):
-        min_ind = int(ind1[0] + ind2[0])
-        max_ind = int(ind1[-1] + ind2[-1])
-        result_length = max_ind - min_ind + 1
-
-        result = [0] * result_length
-        indices = [i for i in range(min_ind, max_ind + 1)]
-
-        for i in range(len(ind1)):
-            for j in range(len(ind2)):
-                index = int(ind1[i] + ind2[j])
-                result[index - min_ind] += val1[i] * val2[j]
-        return indices, result
-
-    @staticmethod
-    def get_new_fc(f1, transition_band, filter_type, fs, f2=None):
+    def calculate_new_fc(f1, transition_band, filter_type, f2=None):
         if filter_type == 'Low pass':
-            return (f1 + (transition_band / 2)) / fs, None
+            return (f1 + (transition_band / 2)), None
         elif filter_type == 'High pass':
-            return (f1 - (transition_band / 2)) / fs, None
+            return (f1 - (transition_band / 2)), None
         elif filter_type == 'Band pass':
-            return (f1 - (transition_band / 2)) / fs, (f2 + (transition_band / 2)) / fs
+            return (f1 - (transition_band / 2)), (f2 + (transition_band / 2))
         else:
-            return (f1 + (transition_band / 2)) / fs, (f2 - (transition_band / 2)) / fs
+            return (f1 + (transition_band / 2)), (f2 - (transition_band / 2))
 
     @staticmethod
-    def calculate_window_items(window_type, total_elements, ):
+    def window_items_list(window_type, total_elements, ):
         windows_list = []
         for element_index in range((total_elements / 2).__ceil__()):
             if window_type == 'hanning':
@@ -582,7 +568,7 @@ class PracticalTaskOne:
         return windows_list
 
     @staticmethod
-    def calculate_filter_items(filter_type, total_elements, new_fc):
+    def filter_items_list(filter_type, total_elements, new_fc):
         f1 = new_fc[0]
         f2 = new_fc[1]
         filtered_list = []
@@ -616,69 +602,61 @@ class PracticalTaskOne:
         return filtered_list
 
     @staticmethod
-    def calculate_filter(file_path, ):
-        filter_type, fs, stop_band, transition_band, f1, f2 = PracticalTaskOne.read_filter_parameters(file_path)
-        window_type = PracticalTaskOne.determine_window_type(stop_band)
-        total_elements = PracticalTaskOne.get_number_of_elements(window_type, fs, transition_band)
-        new_fc = PracticalTaskOne.get_new_fc(f1, transition_band, filter_type, fs, f2)
-        indicates = PracticalTaskOne.fill_the_indicates(total_elements)
-        window_list = PracticalTaskOne.calculate_window_items(window_type, total_elements)
-        filtered_list = PracticalTaskOne.calculate_filter_items(filter_type, total_elements, new_fc)
-        filtered_list = PracticalTaskOne.fill_filtered_list(window_list, filtered_list)
+    def make_the_filter(file_path, ):
+        filter_type, fs, stop_band, transition_band, f1, f2 = PracticalTaskOne.read_filter_specifications(file_path)
+        window_type = PracticalTaskOne.get_window_type(stop_band)
+        total_elements = PracticalTaskOne.calculate_total_elements(window_type, fs, transition_band)
+        new_fc = PracticalTaskOne.calculate_new_fc(f1, transition_band, filter_type, f2)
+        new_fc = tuple(elem / fs if elem is not None else None for elem in new_fc)
+        indicates = PracticalTaskOne.make_the_filtered_indicates(total_elements)
+        window_list = PracticalTaskOne.window_items_list(window_type, total_elements)
+        filtered_list = PracticalTaskOne.filter_items_list(filter_type, total_elements, new_fc)
+        filtered_list = PracticalTaskOne.make_the_filter_list(window_list, filtered_list)
         return indicates, filtered_list
 
     @staticmethod
-    def calculated_filtered_signal(filter_spec_path, indexes_2, signal_2):
-        indicates, filtered_list = PracticalTaskOne.calculate_filter(filter_spec_path)
-        return PracticalTaskOne.convolve_signals(indicates, filtered_list, indexes_2, signal_2, )
+    def apply_filter_on_signal(filter_spec_path, indexes_2, signal_2):
+        indicates, filtered_list = PracticalTaskOne.make_the_filter(filter_spec_path)
+        return TaskSix.convolve(indicates, filtered_list, indexes_2, signal_2, )
 
     @staticmethod
-    def fill_the_indicates(total_elements):
-        list_1 = []
-        list_2 = []
-        for i in range((total_elements / 2).__ceil__()):
-            list_1.append(i)
-            list_2.append(-i)
-        indicates = list_1 + list_2
-        indicates = list(set(indicates))
-        indicates.sort()
-        return indicates
+    def make_the_filtered_indicates(total_elements):
+        indicates = []
+        for i in range(-(total_elements // 2), (total_elements // 2) + 1):
+            indicates.append(i)
+        return sorted(set(indicates))
 
     @staticmethod
-    def fill_filtered_list(window_list, filtered_list):
-        list1 = [x * y for x, y in zip(window_list, filtered_list)]
-        list2 = [x * y for x, y in zip(window_list, filtered_list)]
-        list2.reverse()
-        list2.extend(list1)
-        list2.remove(list2[int(len(list2) / 2)])
-        return list2
+    def make_the_filter_list(window_list, filtered_list):
+        multiplied_values = [x * y for x, y in zip(window_list, filtered_list)]
+        combined_values = multiplied_values[::-1] + multiplied_values
+        combined_values.pop(len(combined_values) // 2)
+        return combined_values
 
     @staticmethod
     def resampling(signal_indicates, signal_list, factor_m, factor_l):
-        filter_spec_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 1/Sampling test cases/Testcase 1/Filter Specifications.txt'
-        filter_indicates, filter_list = PracticalTaskOne.calculate_filter(filter_spec_path)
+        filter_spec_path = ('C:/Users/sheha/Downloads/Practical Task/Practical task 1/Sampling test cases/Testcase '
+                            '1/Filter Specifications.txt')
+        filter_indicates, filter_list = PracticalTaskOne.make_the_filter(filter_spec_path)
 
         if factor_m == 0 and factor_l != 0:
             signal_indicates, signal_list = PracticalTaskOne.sampling_up(signal_indicates, signal_list, factor_l)
-            m, n = PracticalTaskOne.convolve_signals(filter_indicates, filter_list, signal_indicates, signal_list, )
-
+            m, n = TaskSix.convolve(filter_indicates, filter_list, signal_indicates, signal_list, )
             for i in range(2):
-                n.remove(n[-1])
-                m.remove(m[-1])
-
+                n.pop()
+                m.pop()
             return m, n
 
         elif factor_l == 0 and factor_m != 0:
-            x, y = PracticalTaskOne.calculated_filtered_signal(filter_spec_path, signal_indicates, signal_list)
+            x, y = PracticalTaskOne.apply_filter_on_signal(filter_spec_path, signal_indicates, signal_list)
             return PracticalTaskOne.sampling_down(x, y, factor_m)
 
         elif factor_l != 0 and factor_m != 0:
             t, p = PracticalTaskOne.sampling_up(signal_indicates, signal_list, factor_l)
-            x, y = PracticalTaskOne.convolve_signals(filter_indicates, filter_list, t, p, )
+            x, y = TaskSix.convolve(filter_indicates, filter_list, t, p, )
             m, n = PracticalTaskOne.sampling_down(x, y, factor_m)
-
-            n.remove(n[-1])
-            m.remove(m[-1])
+            n.pop()
+            m.pop()
             return m, n
         return None, None
 
@@ -716,7 +694,7 @@ class PracticalTaskTwo:
     folder_test_path = 'C:/Users/sheha/Downloads/Practical Task/Practical task 2/Test Folder'
 
     @staticmethod
-    def appply_filter(minF, maxF, fs, signal):
+    def apply_filter(minF, maxF, fs, signal):
         signal_indicates = [i for i in range(len(signal))]
         stop_band = 50
         transition_band = 500
@@ -727,14 +705,15 @@ class PracticalTaskTwo:
         else:
             filter_type = 'Band Stop'
 
-        window_type = PracticalTaskOne.determine_window_type(stop_band)
-        total_elements = PracticalTaskOne.get_number_of_elements(window_type, fs, transition_band)
-        new_fc = PracticalTaskOne.get_new_fc(f1, transition_band, filter_type, fs, f2)
-        indicates = PracticalTaskOne.fill_the_indicates(total_elements)
-        window_list = PracticalTaskOne.calculate_window_items(window_type, total_elements)
-        filtered_list = PracticalTaskOne.calculate_filter_items(filter_type, total_elements, new_fc)
-        filtered_list = PracticalTaskOne.fill_filtered_list(window_list, filtered_list)
-        return PracticalTaskOne.convolve_signals(indicates, filtered_list, signal_indicates, signal, )
+        window_type = PracticalTaskOne.get_window_type(stop_band)
+        total_elements = PracticalTaskOne.calculate_total_elements(window_type, fs, transition_band)
+        new_fc = PracticalTaskOne.calculate_new_fc(f1, transition_band, filter_type, f2)
+        new_fc = tuple(elem / fs if elem is not None else None for elem in new_fc)
+        indicates = PracticalTaskOne.make_the_filtered_indicates(total_elements)
+        window_list = PracticalTaskOne.window_items_list(window_type, total_elements)
+        filtered_list = PracticalTaskOne.filter_items_list(filter_type, total_elements, new_fc)
+        filtered_list = PracticalTaskOne.make_the_filter_list(window_list, filtered_list)
+        return TaskSix.convolve(indicates, filtered_list, signal_indicates, signal,)[1]
 
     @staticmethod
     def resampling_the_signal(newFs, maxF, Fs, signal_indicates, signal_list):
@@ -744,23 +723,9 @@ class PracticalTaskTwo:
                 return PracticalTaskOne.resampling(signal_indicates, signal_list, 0, (newFs / Fs))
             # down sampling
             elif newFs < Fs:
-                return PracticalTaskOne.resampling(signal_indicates, signal_list, 0, (Fs / newFs))
+                return PracticalTaskOne.resampling(signal_indicates, signal_list, (Fs / newFs), 0)
             return signal_indicates, signal_list
         return None, None
-
-    @staticmethod
-    def remove_dc_component(signal):
-        return TaskSix.remove_dc(signal)
-
-    @staticmethod
-    def normalize_signal(signal):
-        return SignalsMethods.arithmetic_operations_on_signal(
-            operation=ArithmeticSignalOperations.Normalization,
-            y1_values=signal, normalize='-1')
-
-    @staticmethod
-    def auto_corr(signal):
-        return TaskSeven.calculate_cross_correlation(signal, signal)
 
     @staticmethod
     def find_peaks(signal):
@@ -772,27 +737,31 @@ class PracticalTaskTwo:
 
     @staticmethod
     def compute_preserve_coff(signal):
-        signal = PracticalTaskTwo.auto_corr(signal)
+        after_corr = TaskSeven.calculate_cross_correlation(signal, signal)
+        signal = after_corr
         signal = signal[len(signal) // 2:]
         peaks = PracticalTaskTwo.find_peaks(signal)
-        return peaks
-
-    @staticmethod
-    def get_dct(signal):
-        return DCTTransform.dct_transform(signal)
+        return peaks , after_corr
 
     @staticmethod
     def calculate_file_dct(file_path, minF, maxF, fs, newFs):
+        print('inside file dct')
         _, _, _, signal = SignalsMethods.read_signal_from_file_without_indicates(file_path)
+        print('after read signal ')
         signal_indicates = [i for i in range(len(signal))]
-        _, signal = PracticalTaskTwo.appply_filter(minF, maxF, fs, signal)
-
+        signal = PracticalTaskTwo.apply_filter(minF, maxF, fs, signal)
         c, v = PracticalTaskTwo.resampling_the_signal(newFs, maxF, fs, signal_indicates, signal)
         if v is not None:
             signal = v
-        signal = PracticalTaskTwo.normalize_signal(signal)
+        print('before remove dc')
+        signal = TaskSix.remove_dc(signal)
+        print('after remove dc')
+        signal = SignalsMethods.arithmetic_operations_on_signal(
+            operation=ArithmeticSignalOperations.Normalization,
+            y1_values=signal, normalize='-1')
+        print('after normalize')
         signal = PracticalTaskTwo.compute_preserve_coff(signal)
-        return PracticalTaskTwo.get_dct(signal)
+        return DCTTransform.dct_transform(signal)
 
     @staticmethod
     def calculate_average_files(folder_path, minF, maxF, fs, newFs):

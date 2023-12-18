@@ -706,7 +706,9 @@ class Task6:
 
     @staticmethod
     def calculate_convolve():
-        x, y = signal_plot.TaskSix.convolve()
+        _, _, _, indexes_1, signal_1 = signal_plot.SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig1.txt')
+        _, _, _, indexes_2, signal_2 = signal_plot.SignalsMethods.read_signal_from_file('inputs/Input_conv_Sig2.txt')
+        x, y = signal_plot.TaskSix.convolve(indexes_1, signal_1, indexes_2, signal_2)
         msg = ConvTest(x, y)
         messagebox.showinfo(title='Test Case Result', message=msg)
 
@@ -835,17 +837,47 @@ class PracticalTask1:
         plt.tight_layout()
         plt.show()
 
+    def resampling_representation(self, x, y):
+        plt.subplot(2, 1, 1)
+        signal_plot.SignalsMethods.plot_normal_signal(self.signal_inputs, self.signal_values, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal Before Resampling')
+        plt.subplot(2, 1, 2)
+        signal_plot.SignalsMethods.plot_normal_signal(x, y, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal After Resampling')
+        plt.tight_layout()
+        plt.show()
+
     def choose_signal(self):
         _, _, _, self.signal_inputs, self.signal_values = signal_plot.SignalsMethods.read_signal()
 
     def choose_filter(self):
         self.file_path = filedialog.askopenfilename()
-        self.filter_type, self.fs, self.stop_band, self.transition_band, self.f1, self.f2 = signal_plot.PracticalTaskOne.read_filter_parameters(
-            self.file_path)
+        self.filter_type, self.fs, self.stop_band, self.transition_band, self.f1, self.f2 = (
+            signal_plot.PracticalTaskOne
+            .read_filter_specifications(
+                self.file_path))
+        data = {"Filter Type": self.filter_type,
+                "Sampling Frequency": self.fs,
+                "Stop Band": self.stop_band,
+                "Transition Band": self.transition_band,
+                "F1 (FC in low & high)": self.f1,
+                "F2": self.f2,
+                }
+        # Convert the dictionary to a pandas DataFrame
+        df = pd.DataFrame(data, index=[0])
+        for index, row in df.iterrows():
+            self.tree.insert("", tk.END, text=str(index), values=(
+                row["Filter Type"], row["Sampling Frequency"], row["Stop Band"], row['Transition Band'],
+                row['F1 (FC in low & high)'], row['F2']
+            ))
 
     def aplay_filter_to_signal(self):
-        self.x, self.y = signal_plot.PracticalTaskOne.calculate_filter(self.file_path)
-        self.filtered_signal_indicates, self.filtered_signal_values = signal_plot.PracticalTaskOne.convolve_signals(
+        self.x, self.y = signal_plot.PracticalTaskOne.make_the_filter(self.file_path)
+        self.filtered_signal_indicates, self.filtered_signal_values = signal_plot.TaskSix.convolve(
             self.x,
             self.y,
             self.signal_inputs,
@@ -868,8 +900,29 @@ class PracticalTask1:
         signal_plot.SignalsMethods.save_file(self.filtered_signal_indicates, self.filtered_signal_values,
                                              'coefficients.txt')
 
+    def resampling(self):
+        try:
+            m_factor = int(self.factor_m_entry.get())
+        except:
+            m_factor = 0
+        try:
+            l_factor = int(self.factor_l_entry.get())
+        except:
+            l_factor = 0
+        self.xx, self.yy = signal_plot.PracticalTaskOne.resampling(self.signal_inputs, self.signal_values, m_factor,
+                                                                   l_factor)
+        if self.xx is None and self.yy is None:
+            msg = 'Error You can not resampling'
+            messagebox.showinfo(title='Test Case Result', message=msg)
+        else:
+            self.resampling_representation(self.xx, self.yy)
+
+    def test_resampling(self):
+        file_path = filedialog.askopenfilename()
+        msg = Compare_Signals_fir(file_path, self.xx, self.yy)
+        messagebox.showinfo(title='Test Case Result', message=msg)
+
     # show data in grid view
-    # make resampling in the ui
     def __init__(self):
         self.filtered_signal_indicates = None
         self.filtered_signal_values = None
@@ -877,13 +930,19 @@ class PracticalTask1:
         self.signal_values = None
         self.filter_type = None
         self.fs = None
+        self.xx = None
         self.x = None
         self.y = None
+        self.yy = None
         self.stop_band = None
         self.transition_band = None
         self.file_path = None
         self.f1 = None
         self.f2 = None
+        self.factor_l = tk.StringVar()
+        self.factor_l.set('Enter L Factor')
+        self.factor_m = tk.StringVar()
+        self.factor_m.set('Enter M Factor')
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -904,9 +963,72 @@ class PracticalTask1:
         self.task1_btn.grid(row=2, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Save The Coefficients', command=self.save_in_file)
         self.task1_btn.grid(row=3, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Resampling', command=self.resampling)
+        self.task1_btn.grid(row=3, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        label = tk.Label(self.button_frame, text="Enter L Factor", font=('Arial', 15))
+        label.grid(row=4, column=0, sticky=tk.W)
+        label = tk.Label(self.button_frame, text="Enter M Factor", font=('Arial', 15))
+        label.grid(row=4, column=1, sticky=tk.W)
+        self.factor_l_entry = tk.Entry(self.button_frame, font=('Arial', 16), textvariable=self.factor_l, )
+        self.factor_l_entry.grid(row=5, column=0, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.factor_m_entry = tk.Entry(self.button_frame, font=('Arial', 16), textvariable=self.factor_m)
+        self.factor_m_entry.grid(row=5, column=1, padx=5, sticky=tk.W + tk.E, pady=18)
+        self.task1_btn = tk.Button(self.button_frame, text='Test Resampling', command=self.test_resampling)
+        self.task1_btn.grid(row=6, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.tree = ttk.Treeview(self.button_frame)
+        self.tree["columns"] = (
+            "Filter Type", "Sampling Frequency", "Stop Band", "Transition Band", "F1 (FC in low & high)", 'F2')
+        # Format the columns
+        self.tree.column("#0", width=15, stretch=tk.NO, anchor="center")
+        self.tree.column("Filter Type", width=55, anchor="center")
+        self.tree.column("Sampling Frequency", width=100, anchor="center")
+        self.tree.column("Stop Band", width=55, anchor="center")
+        self.tree.column("Transition Band", width=80, anchor="center")
+        self.tree.column("F1 (FC in low & high)", width=100, anchor="center")
+        self.tree.column("F2", width=22, anchor="center")
+        # Add headings for the columns
+        self.tree.heading("#0", text="#0", anchor=tk.CENTER)
+        self.tree.heading("Filter Type", text="Filter Type", anchor=tk.CENTER)
+        self.tree.heading("Sampling Frequency", text="Sampling Frequency", anchor=tk.CENTER)
+        self.tree.heading("Stop Band", text="Stop Band", anchor=tk.CENTER)
+        self.tree.heading("Transition Band", text="Transition Band", anchor=tk.CENTER)
+        self.tree.heading("F1 (FC in low & high)", text="F1 (FC in low & high)", anchor=tk.CENTER)
+        self.tree.heading("F2", text="F2", anchor=tk.CENTER)
+        self.tree.grid(row=7, sticky=tk.W + tk.E, pady=18, padx=4)
         self.button_frame.pack(fill='x', pady=15)
         self.root.mainloop()
 
+
+class PracticalTask2:
+    t = signal_plot.PracticalTaskTwo()
+
+    def pre_processing_folder_a(self):
+        pass
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title('Choose Task')
+        self.root.geometry('800x500')
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.columnconfigure(1, weight=1)
+        label = tk.Label(self.button_frame, text="Minimum Frequency", font=('Arial', 15))
+        label.grid(row=0, column=0, sticky=tk.W)
+        label = tk.Label(self.button_frame, text="Maximum Frequency", font=('Arial', 15))
+        label.grid(row=0, column=1, sticky=tk.W)
+        self.min_entry = tk.Entry(self.button_frame, font=('Arial', 16), )
+        self.min_entry.grid(row=1, column=0, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.max_entry = tk.Entry(self.button_frame, font=('Arial', 16), )
+        self.max_entry.grid(row=1, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        label = tk.Label(self.button_frame, text="Sampling Frequency", font=('Arial', 15))
+        label.grid(row=2, column=0, sticky=tk.W)
+        label = tk.Label(self.button_frame, text="New Sampling Frequency", font=('Arial', 15))
+        label.grid(row=2, column=1, sticky=tk.W)
+        self.fs_entry = tk.Entry(self.button_frame, font=('Arial', 16), )
+        self.fs_entry.grid(row=3, column=0, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.newFs = tk.Entry(self.button_frame, font=('Arial', 16), )
+        self.newFs.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.button_frame.pack(fill='x', pady=10)
+        self.root.mainloop()
 
 class MainGui:
 
@@ -938,6 +1060,9 @@ class MainGui:
         def open_practical_task_one():
             PracticalTask1()
 
+        def open_practical_task_two():
+            PracticalTask2()
+
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -962,7 +1087,7 @@ class MainGui:
         self.task1_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.task1_btn = tk.Button(self.button_frame, text='Practical Task One', command=open_practical_task_one)
         self.task1_btn.grid(row=5, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
-        self.task1_btn = tk.Button(self.button_frame, text='Practical Task Two')
+        self.task1_btn = tk.Button(self.button_frame, text='Practical Task Two', command=open_practical_task_two)
         self.task1_btn.grid(row=5, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
