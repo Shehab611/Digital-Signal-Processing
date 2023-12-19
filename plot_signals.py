@@ -288,7 +288,6 @@ class DCTTransform:
     @staticmethod
     def calculate_one_element(signal_values, n, k):
         angle = DCTTransform.calculate_angle(len(signal_values), n, k)
-
         return signal_values[n] * angle
 
     @staticmethod
@@ -320,8 +319,9 @@ class DCTTransform:
     def remove_dc_component(signal_values):
         len_of_values = len(signal_values)
         removed_values = []
+        mean_value = DCTTransform.calculate_mean_of_signal(signal_values)
         for i in range(len_of_values):
-            result = signal_values[i] - DCTTransform.calculate_mean_of_signal(signal_values)
+            result = signal_values[i] - mean_value
             removed_values.append(round(result, 3))
         return removed_values
 
@@ -713,7 +713,7 @@ class PracticalTaskTwo:
         window_list = PracticalTaskOne.window_items_list(window_type, total_elements)
         filtered_list = PracticalTaskOne.filter_items_list(filter_type, total_elements, new_fc)
         filtered_list = PracticalTaskOne.make_the_filter_list(window_list, filtered_list)
-        return TaskSix.convolve(indicates, filtered_list, signal_indicates, signal,)[1]
+        return TaskSix.convolve(indicates, filtered_list, signal_indicates, signal, )
 
     @staticmethod
     def resampling_the_signal(newFs, maxF, Fs, signal_indicates, signal_list):
@@ -741,37 +741,36 @@ class PracticalTaskTwo:
         signal = after_corr
         signal = signal[len(signal) // 2:]
         peaks = PracticalTaskTwo.find_peaks(signal)
-        return peaks , after_corr
+        return peaks, after_corr
 
     @staticmethod
     def calculate_file_dct(file_path, minF, maxF, fs, newFs):
-        print('inside file dct')
         _, _, _, signal = SignalsMethods.read_signal_from_file_without_indicates(file_path)
-        print('after read signal ')
         signal_indicates = [i for i in range(len(signal))]
-        signal = PracticalTaskTwo.apply_filter(minF, maxF, fs, signal)
+        _, signal = PracticalTaskTwo.apply_filter(minF, maxF, fs, signal)
         c, v = PracticalTaskTwo.resampling_the_signal(newFs, maxF, fs, signal_indicates, signal)
         if v is not None:
             signal = v
-        print('before remove dc')
-        signal = TaskSix.remove_dc(signal)
-        print('after remove dc')
+        signal = DCTTransform.remove_dc_component(signal)
         signal = SignalsMethods.arithmetic_operations_on_signal(
             operation=ArithmeticSignalOperations.Normalization,
             y1_values=signal, normalize='-1')
-        print('after normalize')
-        signal = PracticalTaskTwo.compute_preserve_coff(signal)
-        return DCTTransform.dct_transform(signal)
+        signal, after_corr = PracticalTaskTwo.compute_preserve_coff(signal)
+        return DCTTransform.dct_transform(signal), after_corr, signal
 
     @staticmethod
     def calculate_average_files(folder_path, minF, maxF, fs, newFs):
         dcts = []
+        after_corr = []
+        after_pres = []
         for filename in os.listdir(folder_path):
             file_path = os.path.join(folder_path, filename)
             if os.path.isfile(file_path) and filename.endswith('.txt'):
-                x = PracticalTaskTwo.calculate_file_dct(file_path, minF, maxF, fs, newFs)
+                x, y, z = PracticalTaskTwo.calculate_file_dct(file_path, minF, maxF, fs, newFs)
                 dcts.append(sum(x) / len(x))
-        return dcts
+                after_corr.append(y)
+                after_pres.append(z)
+        return dcts, after_corr, after_pres
 
 
 class SignalType(Enum):

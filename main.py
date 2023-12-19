@@ -1,11 +1,12 @@
 import gui_file as gui
+from kjhuikhbkl import ECG
 from plot_signals import PracticalTaskOne, SignalsMethods, PracticalTaskTwo, TaskSeven
 import tkinter as tk
 from tkinter import filedialog
 from test_output import Compare_Signals_fir
 
 
-#gui.MainGui()
+gui.MainGui()
 
 
 def open_file_dialog():
@@ -15,8 +16,10 @@ def open_file_dialog():
     file_path = filedialog.askopenfilename()
     return file_path
 
-x = PracticalTaskTwo()
-dcta = PracticalTaskTwo.calculate_average_files(x.folder_one_path, 10, 50, 150, 300)
+
+
+# x = PracticalTaskTwo()
+# dcta = PracticalTaskTwo.calculate_average_files(x.folder_one_path, 10, 50, 150, 300)
 # dctb = PracticalTaskTwo.calculate_average_files(x.folder_two_path, 10, 50, 150, 300)
 # dcttest = PracticalTaskTwo.calculate_average_files(x.folder_test_path, 10, 50, 150, 300)
 # correlation1 = TaskSeven.calculate_cross_correlation(dcta, dcttest)

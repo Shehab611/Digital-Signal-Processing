@@ -1000,11 +1000,285 @@ class PracticalTask1:
 
 
 class PracticalTask2:
-    t = signal_plot.PracticalTaskTwo()
 
     def pre_processing_folder_a(self):
-        pass
+        self.dcta, self.signals_a_after_corr, self.signals_a_after_presrv = signal_plot.PracticalTaskTwo.calculate_average_files(
+            signal_plot.PracticalTaskTwo().folder_one_path, int(self.min_entry.get()), int(self.max_entry.get()),
+            int(self.fs_entry.get()), int(self.newFs_entry.get()))
+        print('pre processing in a finish')
+
+    def pre_processing_folder_b(self):
+        self.dctb, self.signals_b_after_corr, self.signals_b_after_presrv = signal_plot.PracticalTaskTwo.calculate_average_files(
+            signal_plot.PracticalTaskTwo().folder_two_path, int(self.min_entry.get()), int(self.max_entry.get()),
+            int(self.fs_entry.get()), int(self.newFs_entry.get()))
+        print('pre processing in b finish')
+
+    def pre_processing_folder_test(self):
+        self.dcttest, self.signals_test_after_corr, self.signals_test_after_presrv = signal_plot.PracticalTaskTwo.calculate_average_files(
+            signal_plot.PracticalTaskTwo().folder_test_path, int(self.min_entry.get()), int(self.max_entry.get()),
+            int(self.fs_entry.get()), int(self.newFs_entry.get()))
+        print('pre processing in test finish')
+
+    def plot_corr_signal_a(self):
+        plt.subplot(6, 1, 1)
+        x = [i for i in range(len(self.signals_a_after_corr[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 1 after auto corr')
+        plt.subplot(6, 1, 2)
+        x = [i for i in range(len(self.signals_a_after_corr[1]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 2 after auto corr')
+        plt.subplot(6, 1, 3)
+        x = [i for i in range(len(self.signals_a_after_corr[2]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[2], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 3 after auto corr')
+        plt.subplot(6, 1, 4)
+        x = [i for i in range(len(self.signals_a_after_corr[3]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[3], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 4 after auto corr')
+        plt.subplot(6, 1, 5)
+        x = [i for i in range(len(self.signals_a_after_corr[4]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[4], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 5 after auto corr')
+        plt.subplot(6, 1, 6)
+        x = [i for i in range(len(self.signals_a_after_corr[5]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_corr[5], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 6 after auto corr')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_corr_signal_b(self):
+        plt.subplot(6, 1, 1)
+        x = [i for i in range(len(self.signals_b_after_corr[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 1 after auto corr')
+        plt.subplot(6, 1, 2)
+        x = [i for i in range(len(self.signals_b_after_corr[1]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 2 after auto corr')
+        plt.subplot(6, 1, 3)
+        x = [i for i in range(len(self.signals_b_after_corr[2]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[2], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 3 after auto corr')
+        plt.subplot(6, 1, 4)
+        x = [i for i in range(len(self.signals_b_after_corr[3]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[3], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 4 after auto corr')
+        plt.subplot(6, 1, 5)
+        x = [i for i in range(len(self.signals_b_after_corr[4]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[4], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 5 after auto corr')
+        plt.subplot(6, 1, 6)
+        x = [i for i in range(len(self.signals_b_after_corr[5]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_corr[5], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 6 after auto corr')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_corr_signal_test(self):
+        plt.subplot(2, 1, 1)
+        x = [i for i in range(len(self.signals_test_after_corr[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_test_after_corr[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Test Signal 1 After corr')
+        plt.subplot(2, 1, 2)
+        x = [i for i in range(len(self.signals_test_after_corr[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_test_after_corr[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Test Signal 2 After corr')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_presrv_signal_a(self):
+        plt.subplot(6, 1, 1)
+        x = [i for i in range(len(self.signals_a_after_presrv[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 1 after preserving ')
+        plt.subplot(6, 1, 2)
+        x = [i for i in range(len(self.signals_a_after_presrv[1]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 2 after preserving ')
+        plt.subplot(6, 1, 3)
+        x = [i for i in range(len(self.signals_a_after_presrv[2]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[2], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 3 after preserving ')
+        plt.subplot(6, 1, 4)
+        x = [i for i in range(len(self.signals_a_after_presrv[3]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[3], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 4 after preserving ')
+        plt.subplot(6, 1, 5)
+        x = [i for i in range(len(self.signals_a_after_presrv[4]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[4], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 5 after preserving ')
+        plt.subplot(6, 1, 6)
+        x = [i for i in range(len(self.signals_a_after_presrv[5]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_a_after_presrv[5], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 6 after preserving ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_presrv_signal_b(self):
+        plt.subplot(6, 1, 1)
+        x = [i for i in range(len(self.signals_b_after_presrv[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 1 after preserving ')
+        plt.subplot(6, 1, 2)
+        x = [i for i in range(len(self.signals_b_after_presrv[1]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 2 after preserving ')
+        plt.subplot(6, 1, 3)
+        x = [i for i in range(len(self.signals_b_after_presrv[2]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[2], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 3 after preserving ')
+        plt.subplot(6, 1, 4)
+        x = [i for i in range(len(self.signals_b_after_presrv[3]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[3], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 4 after preserving ')
+        plt.subplot(6, 1, 5)
+        x = [i for i in range(len(self.signals_b_after_presrv[4]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[4], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 5 after preserving ')
+        plt.subplot(6, 1, 6)
+        x = [i for i in range(len(self.signals_b_after_presrv[5]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_b_after_presrv[5], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 6 after preserving ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_presrv_signal_test(self):
+        plt.subplot(2, 1, 1)
+        x = [i for i in range(len(self.signals_test_after_presrv[0]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_test_after_presrv[0], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Test Signal 1 after preserving ')
+        plt.subplot(2, 1, 2)
+        x = [i for i in range(len(self.signals_test_after_presrv[1]))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.signals_test_after_presrv[1], 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Test Signal 2 after preserving ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_dct_signal_a(self):
+        plt.subplot(1, 1, 1)
+        x = [i for i in range(len(self.dcta))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.dcta, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal A 1 after DCT ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_dct_signal_b(self):
+        plt.subplot(1, 1, 1)
+        x = [i for i in range(len(self.dctb))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.dctb, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Signal B 1 after DCT ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_dct_signal_test(self):
+        plt.subplot(1, 1, 1)
+        print(self.dcttest)
+        x = [i for i in range(len(self.dcttest))]
+        signal_plot.SignalsMethods.plot_normal_signal(x, self.dcttest, 'x',
+                                                      'y',
+                                                      signal_plot.SignalType.Continuous,
+                                                      'Test Signal 1 after DCT ')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_all_a(self):
+        self.plot_dct_signal_a()
+        self.plot_presrv_signal_a()
+        self.plot_corr_signal_a()
+
+    def plot_all_b(self):
+        self.plot_dct_signal_b()
+        self.plot_presrv_signal_b()
+        self.plot_corr_signal_b()
+
+    def plot_all_test(self):
+        self.plot_dct_signal_test()
+        self.plot_presrv_signal_test()
+        self.plot_corr_signal_test()
+
+    def template_match(self):
+        correlation1 = signal_plot.TaskSeven.calculate_cross_correlation(self.dcta, self.dcttest)
+        correlation2 = signal_plot.TaskSeven.calculate_cross_correlation(self.dctb, self.dcttest)
+        maxx = correlation1[0]
+        maxx1 = correlation2[0]
+        if maxx > maxx1:
+            msg = 'Test Signal 1 belongs to class B ', 'Test Signal 2 belongs to class A '
+        else:
+            msg = 'Test Signal 2 belongs to class B ', 'Test Signal 1 belongs to class A'
+        msg = f'{msg[0]} , {msg[1]}'
+        messagebox.showinfo('Template Matching Result', msg)
+
     def __init__(self):
+        self.signals_test_after_corr = None
+        self.dcttest = None
+        self.signals_test_after_presrv = None
+        self.dcta = None
+        self.signals_a_after_corr = None
+        self.signals_a_after_presrv = None
+        self.dctb = None
+        self.signals_b_after_corr = None
+        self.signals_b_after_presrv = None
         self.root = tk.Tk()
         self.root.title('Choose Task')
         self.root.geometry('800x500')
@@ -1025,10 +1299,32 @@ class PracticalTask2:
         label.grid(row=2, column=1, sticky=tk.W)
         self.fs_entry = tk.Entry(self.button_frame, font=('Arial', 16), )
         self.fs_entry.grid(row=3, column=0, padx=5, sticky=tk.W + tk.E, pady=10)
-        self.newFs = tk.Entry(self.button_frame, font=('Arial', 16), )
-        self.newFs.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.newFs_entry = tk.Entry(self.button_frame, font=('Arial', 16), )
+        self.newFs_entry.grid(row=3, column=1, padx=5, sticky=tk.W + tk.E, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='PreProcessing Signal A',
+                                   command=self.pre_processing_folder_a)
+        self.task1_btn.grid(row=4, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='PreProcessing Signal B',
+                                   command=self.pre_processing_folder_b)
+        self.task1_btn.grid(row=4, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='PreProcessing Signal Test',
+                                   command=self.pre_processing_folder_test)
+        self.task1_btn.grid(row=4, column=2, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='plot Signal A',
+                                   command=self.plot_all_a)
+        self.task1_btn.grid(row=5, column=0, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='plot Signal B',
+                                   command=self.plot_all_a)
+        self.task1_btn.grid(row=5, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='plot Signal Test',
+                                   command=self.plot_all_test)
+        self.task1_btn.grid(row=5, column=2, sticky=tk.W + tk.E, padx=10, pady=10)
+        self.task1_btn = tk.Button(self.button_frame, text='Template Matching',
+                                   command=self.template_match)
+        self.task1_btn.grid(row=6, column=1, sticky=tk.W + tk.E, padx=10, pady=10)
         self.button_frame.pack(fill='x', pady=10)
         self.root.mainloop()
+
 
 class MainGui:
 
