@@ -299,17 +299,16 @@ def Compare_Signals_fir(file_name, Your_indices, Your_samples):
     print(file_name)
     print("\n")
     if (len(expected_samples) != len(Your_samples)) and (len(expected_indices) != len(Your_indices)):
-        print("Test case failed, your signal have different length from the expected one")
-        return ("Test case failed, your signal have different length from the expected one")
+        return("Test case failed, your signal have different length from the expected one")
+        return
     for i in range(len(Your_indices)):
         if (Your_indices[i] != expected_indices[i]):
-            print("Test case failed, your signal have different indicies from the expected one")
-            return"Test case failed, your signal have different indicies from the expected one"
+            return("Test case failed, your signal have different indicies from the expected one")
+            return
     for i in range(len(expected_samples)):
         if abs(Your_samples[i] - expected_samples[i]) < 0.01:
             continue
         else:
-            print("Test case failed, your signal have different values from the expected one")
             return("Test case failed, your signal have different values from the expected one")
-    print("Test case passed successfully")
-    return ("Test case passed successfully")
+            return
+    return("Test case passed successfully")
